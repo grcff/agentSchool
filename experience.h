@@ -22,9 +22,9 @@ public:
     Scalar getXP();
     Scalar getYP();
     Scalar getYawP();
-    std::vector<Scalar> getXVec();
-    std::vector<Scalar> getYVec();
-    std::vector<Scalar> getYawVec();
+    Scalar getX(int i);
+    Scalar getY(int i);
+    Scalar getYaw(int i);
 
     void update(Scalar t);
 

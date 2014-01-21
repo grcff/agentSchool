@@ -1,3 +1,4 @@
+import numpy as np
 import pygame
 import experience as exp
 
@@ -8,23 +9,23 @@ white = ( 255, 255, 255)
 green = ( 0, 255, 0)
 red = ( 255, 0, 0)
 
+agentNumber = 2
 predatorSize = [50, 50, 10]
+boxSize = [300., 300., -300., -300]
 
 #Create a new experience
-exp = exp.Experience(1, 10., 0., 2., 300., 300., -300., -300)
+exp = exp.Experience(agentNumber, 10., 0., 5., boxSize[0], boxSize[1], boxSize[2], boxSize[3])
 
 pygame.init()
 
 # Set the height and width of the aquarium
-size = [600, 600]
+size = [650, 650]
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Agent School")
 #Loop until the user clicks the close button.
 done = False
 # Used to manage how fast the screen updates
 clock = pygame.time.Clock()
-
-test = exp.getXVec()
 
 # -------- Main Program Loop -----------
 while done == False:
@@ -35,7 +36,13 @@ while done == False:
 	screen.fill(black)
 	# Draw the rectangle
 	pygame.draw.ellipse(screen, green, [exp.getXP() + 300, exp.getYP() + 300, predatorSize[0], predatorSize[1]], predatorSize[2])
-	#pygame.draw.ellipse(screen, red, [exp.getXVec()[0] + 300, exp.getYVec()[0] + 300, 30, 30], 10)
+"""	
+	for i in range(agentNumber):	
+		pygame.draw.ellipse(screen, red, [exp.getX(i) + 300, exp.getY(i) + 300, 30, 30], 10)
+		pygame.draw.line(screen, white, [exp.getX(i) + 300 + 30/2, exp.getY(i) + 300+ 30/2], [exp.getX(i) + 300 + 20*np.cos(exp.getYaw(i))+ 30/2, exp.getY(i) + 300 + 20*np.sin(exp.getYaw(i))+ 30/2], 5)
+"""
+	pygame.draw.ellipse(screen, red, [exp.getX(1) + 300, exp.getY(1) + 300, 30, 30], 10)
+	pygame.draw.line(screen, white, [exp.getX(1) + 300 + 30/2, exp.getY(1) + 300+ 30/2], [exp.getX(1) + 300 + 20*np.cos(exp.getYaw(1))+ 30/2, exp.getY(1) + 300 + 20*np.sin(exp.getYaw(1))+ 30/2], 5)
 	exp.update(1.)
 	# Limit to 20 frames per second
 	clock.tick(50)

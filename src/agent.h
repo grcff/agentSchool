@@ -1,6 +1,6 @@
 #ifndef AGENT_H
 #define AGENT_H
-
+#include <iostream>
 #include "types.h"
 #include "tools.h"
 
@@ -9,10 +9,7 @@ class Agent
 public:
     // Constructors
     Agent();
-    Agent(Scalar x,
-          Scalar y,
-          Scalar yaw,
-          Scalar vMax,
+    Agent(Scalar vMax,
           Scalar wMax,
           Scalar sightHorizon,
           Scalar sightMaxAngle,
@@ -75,6 +72,11 @@ private:
     Scalar xGetPredatorDistanceGradient(Scalar t);
     Scalar xGetLowSpeedHessian(Scalar t);
     Scalar xGetLowSpeedGradient(Scalar t);
+
+    Scalar xGetVMaxBound(Scalar t);
+
+    // Wrap angle between 0 and 2Pi
+    Scalar wrapAngle(Scalar angle);
 
     // Agent coordinates and yaw angle
     Scalar x_;

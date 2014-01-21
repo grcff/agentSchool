@@ -15,15 +15,13 @@ Experience::Experience(int nbAgent,
     :box_(xMax, yMax, xMin, yMin)
     ,predator_(xP, yP, v, box_)
     ,agentVec_(nbAgent,
-               Agent((box_.xMax_ - box_.xMin_)*((Scalar) rand() / (RAND_MAX)) + box_.xMin_,
-                     (box_.yMax_ - box_.yMin_)*((Scalar) rand() / (RAND_MAX)) + box_.yMin_,
-                     2*M_PI*((Scalar) rand() / (RAND_MAX)),
-                     v,
-                     M_PI/16.,
+               Agent(v/2.,
+                     M_PI/100.,//M_PI/16.,
                      100,
                      3.*M_PI/4.,
                      box_))
 //http://stackoverflow.com/questions/2860673/initializing-a-c-vector-to-random-values-fast
+//http://stackoverflow.com/questions/6157409/stdvector-to-boostpythonlist
 {
     xInit(nbAgent, v);
 }
@@ -43,19 +41,19 @@ Scalar Experience::getYawP()
     return predator_.getYaw();
 }
 
-std::vector<Scalar> Experience::getXVec()
+Scalar Experience::getX(int i)
 {
-    return xVec_;
+    return xVec_[i];
 }
 
-std::vector<Scalar> Experience::getYVec()
+Scalar Experience::getY(int i)
 {
-    return yVec_;
+    return yVec_[i];
 }
 
-std::vector<Scalar> Experience::getYawVec()
+Scalar Experience::getYaw(int i)
 {
-    return yawVec_;
+    return yawVec_[i];
 }
 
 void Experience::update(Scalar t)
@@ -73,17 +71,22 @@ void Experience::update(Scalar t)
 
 void Experience::xInit(int nbAgent, Scalar v)
 {
+    srand(time(NULL));
+
     xVec_.resize(nbAgent);
     yVec_.resize(nbAgent);
     yawVec_.resize(nbAgent);
 
     for(int i=0; i<nbAgent; ++i)
     {
+        agentVec_[i].setX((box_.xMax_ - box_.xMin_)*((Scalar) rand() / (RAND_MAX)) + box_.xMin_);
+        agentVec_[i].setY((box_.yMax_ - box_.yMin_)*((Scalar) rand() / (RAND_MAX)) + box_.yMin_);
+        agentVec_[i].setYaw(2*M_PI*((Scalar) rand() / (RAND_MAX)));
+
         xVec_[i] = agentVec_[i].getX();
         yVec_[i] = agentVec_[i].getY();
         yawVec_[i] = agentVec_[i].getYaw();
     }
-
 }
 
 
@@ -93,10 +96,10 @@ void Experience::xUpdateEnvironment(int agentIndex)
 
     agent.setXP(predator_.getX());
     agent.setYP(predator_.getY());
-
+/*
     Scalar diffX(0.);
     Scalar diffY(0.);
-    /*
+
     for (size_t i=0; i<agentVec_.size(); ++i)
     {
         if(i!=agentIndex)
@@ -105,9 +108,8 @@ void Experience::xUpdateEnvironment(int agentIndex)
             diffX = neighbor.getX() - agent.getX();
             diffY = neighbor.getY() - agent.getY();
 
-            //TODO: mettre autre chose que 30 (un attribut de agent)
-            if(std::abs(std::atan(diffY)/diffX - agent.getYaw()) < 3.*M-PI/4. &&
-                    std::abs(diffX*diffX + diffY*diffY) < 30.)
+            if(std::abs(std::atan(diffY)/diffX - agent.getYaw()) < agent.getSightMaxAngle() &&
+                    std::abs(diffX*diffX + diffY*diffY) < agent.getSightHorizon())
             {
                 int agent.getNVec().
                         agent.setNVecSize()
@@ -133,9 +135,9 @@ BOOST_PYTHON_MODULE(experience)
             .def("getXP", &Experience::getXP)
             .def("getYP", &Experience::getYP)
             .def("getYawP", &Experience::getYawP)
-            .def("getXVec", &Experience::getXVec)
-            .def("getYVec", &Experience::getYVec)
-            .def("getYawVec", &Experience::getYawVec)
+            .def("getX", &Experience::getX)
+            .def("getY", &Experience::getY)
+            .def("getYaw", &Experience::getYaw)
             .def("update", &Experience::update)
             ;
 

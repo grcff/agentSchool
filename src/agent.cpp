@@ -1,5 +1,6 @@
 #include "agent.h"
 #include "tools.cpp"
+#include <stdio.h>
 
 Agent::Agent()
     :x_(0.)
@@ -20,17 +21,14 @@ Agent::Agent()
     nYawVec_.resize(0.);
 }
 
-Agent::Agent(Scalar x,
-             Scalar y,
-             Scalar yaw,
-             Scalar vMax,
+Agent::Agent(Scalar vMax,
              Scalar wMax,
              Scalar sightHorizon,
              Scalar sightMaxAngle,
              Box box)
-    :x_(x)
-    ,y_(y)
-    ,yaw_(yaw)
+    :x_(0.)
+    ,y_(0.)
+    ,yaw_(0.)
     ,xP_(0.)
     ,yP_(0.) //change to box.yMax_ + sightHorizon
     ,vMax_(vMax)
@@ -55,21 +53,27 @@ Agent::~Agent()
 
 void Agent::updatePos(Scalar t)
 {
-// Updtating yaw coordinate
-hessian_ = 0.;
-hessian_ += xGetBackPredatorHessian(t);
-gradient_ = 0.;
-gradient_ += xGetBackPredatorGradient(t);
-yaw_ += Solver::solve(hessian_, gradient_, wMax_, -wMax_)*t;
+    // Updtating yaw coordinate
+    hessian_ = 0.;
+    hessian_ += xGetBackPredatorHessian(t);
+    gradient_ = 0.;
+    gradient_ += xGetBackPredatorGradient(t);
+    yaw_ += Solver::solve(hessian_, 2*gradient_, wMax_, -wMax_)*t;
+    //yaw_ = std::atan2(yP_- y_, xP_- x_) + M_PI;
+    //Ca à l'air de marcher!!
 
-// Updating x and y coordinate
-hessian_ = 0.;
-hessian_ += xGetPredatorDistanceHessian(t);
-gradient_ = 0.;
-gradient_ += xGetPredatorDistanceHessian(t);
-Scalar sol = Solver::solve(hessian_, gradient_, vMax_, 0.);
-x_ += sol*std::cos(yaw_)*t;
-y_ += sol*std::sin(yaw_)*t;
+
+    // Updating x and y coordinate
+    hessian_ = 0.;
+    hessian_ += xGetPredatorDistanceHessian(t);
+    gradient_ = 0.;
+    gradient_ += xGetPredatorDistanceHessian(t);
+    //std::cout << "xGetVMaxBound "<<xGetVMaxBound(t) << std::endl;
+    //std::cout << "vMax_ "<<vMax_ << std::endl;
+    //std::cout << std::min(xGetVMaxBound(t), vMax_) << std::endl;
+    Scalar sol = Solver::solve(hessian_, 2*gradient_, std::min(xGetVMaxBound(t), vMax_), 0.);
+    x_ += sol*std::cos(yaw_)*t;
+    y_ += sol*std::sin(yaw_)*t;
 }
 
 void Agent::setX(Scalar x)
@@ -139,7 +143,7 @@ Scalar Agent::xGetBackPredatorHessian(Scalar t)
 
 Scalar Agent::xGetBackPredatorGradient(Scalar t)
 {
-    return t*(yaw_ - std::atan((y_- yP_)/(x_- xP_)));
+    return t*(wrapAngle(yaw_) - wrapAngle(std::atan2(yP_- y_, xP_- x_) + M_PI));
 }
 
 
@@ -183,4 +187,60 @@ Scalar Agent::xGetLowSpeedHessian(Scalar t)
 Scalar Agent::xGetLowSpeedGradient(Scalar t)
 {
     return 0.;
+}
+
+Scalar Agent::xGetVMaxBound(Scalar t)
+{
+    if(std::cos(yaw_) > EPSILON)
+    {
+        if(std::sin(yaw_) > EPSILON)
+        {
+            return std::min((box_.xMax_ - x_)/(std::cos(yaw_)*t),
+                            (box_.yMax_ - y_)/(std::sin(yaw_)*t));
+        }
+        else if(std::sin(yaw_) < EPSILON)
+        {
+            return std::min((box_.xMax_ - x_)/(std::cos(yaw_)*t),
+                            (y_ - box_.yMax_)/(std::sin(yaw_)*t));
+
+        }
+        else
+        {
+            return (box_.xMax_ - x_)/(std::cos(yaw_)*t);
+        }
+    }
+    else if(std::cos(yaw_) < EPSILON)
+    {
+        if(std::sin(yaw_) > EPSILON)
+        {
+            return std::min((x_ - box_.xMax_)/(std::cos(yaw_)*t),
+                            (box_.yMax_ - y_)/(std::sin(yaw_)*t));
+        }
+        else if(std::sin(yaw_) < EPSILON)
+        {
+            return std::min((x_ - box_.xMax_)/(std::cos(yaw_)*t),
+                            (y_ - box_.yMax_)/(std::sin(yaw_)*t));
+        }
+        else
+        {
+            return (x_ - box_.xMax_)/(std::cos(yaw_)*t);
+        }
+    }
+    else
+    {
+        if(std::sin(yaw_) > EPSILON)
+        {
+            return (box_.yMax_ - y_)/(std::sin(yaw_)*t);
+        }
+        else
+        {
+            return (y_ - box_.yMax_)/(std::sin(yaw_)*t);
+        }
+
+    }
+}
+
+Scalar Agent::wrapAngle(Scalar angle)
+{
+    return angle - 2*M_PI*std::floor(angle/(2*M_PI));
 }
