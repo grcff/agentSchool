@@ -9,6 +9,7 @@ agentSchool is a c++/python project which aims to reproduce the schooling behavi
 For now, the predator is initially set with a random direction and only moves forward with a constant speed.
 Agents are initially placed in random positions in the aquarium, with random directions. They are able to rotate around their yaw axis up to a maximum angular speed limit, and they can move forward up to a maximum speed limit. They constantly know where is the predator, and they see the other agents up to a maximum distance and up to a maximum angle of view. The agents that one agent can see are called its 'neighbors'. 
 Each agent moves are determined by a quadratic problem which models the following target:
+
 1. Fleeing from the predator 
   * Turning agent's back away from predator
   * Maximize the distance between the agent and the predator
