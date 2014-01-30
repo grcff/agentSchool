@@ -35,14 +35,16 @@ while done == False:
 	# Set the screen background
 	screen.fill(black)
 	# Draw the rectangle
-	pygame.draw.ellipse(screen, green, [exp.getXP() + 300, exp.getYP() + 300, predatorSize[0], predatorSize[1]], predatorSize[2])
-"""	
+	pygame.draw.ellipse(screen, green, [exp.getXP() - boxSize[2], exp.getYP() - boxSize[3], predatorSize[0], predatorSize[1]], predatorSize[2])
+	
 	for i in range(agentNumber):	
-		pygame.draw.ellipse(screen, red, [exp.getX(i) + 300, exp.getY(i) + 300, 30, 30], 10)
-		pygame.draw.line(screen, white, [exp.getX(i) + 300 + 30/2, exp.getY(i) + 300+ 30/2], [exp.getX(i) + 300 + 20*np.cos(exp.getYaw(i))+ 30/2, exp.getY(i) + 300 + 20*np.sin(exp.getYaw(i))+ 30/2], 5)
-"""
-	pygame.draw.ellipse(screen, red, [exp.getX(1) + 300, exp.getY(1) + 300, 30, 30], 10)
-	pygame.draw.line(screen, white, [exp.getX(1) + 300 + 30/2, exp.getY(1) + 300+ 30/2], [exp.getX(1) + 300 + 20*np.cos(exp.getYaw(1))+ 30/2, exp.getY(1) + 300 + 20*np.sin(exp.getYaw(1))+ 30/2], 5)
+		pygame.draw.ellipse(screen, red, [exp.getX(i) - boxSize[2], exp.getY(i) - boxSize[3], 30, 30], 10)
+		pygame.draw.line(screen, white, [exp.getX(i) - boxSize[2] + 30/2, exp.getY(i) - boxSize[3] + 30/2], [exp.getX(i) - boxSize[2] + 20*np.cos(exp.getYaw(i))+ 30/2, exp.getY(i) - boxSize[3] + 20*np.sin(exp.getYaw(i))+ 30/2], 5)
+		print 'X'		
+		print exp.getX(i) - boxSize[2]
+		print 'Y'		
+		print exp.getY(i) - boxSize[2]
+
 	exp.update(1.)
 	# Limit to 20 frames per second
 	clock.tick(50)

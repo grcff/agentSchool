@@ -53,24 +53,48 @@ Agent::~Agent()
 
 void Agent::updatePos(Scalar t)
 {
-    // Updtating yaw coordinate
+    // Reset gradient and hessian_
     hessian_ = 0.;
-    hessian_ += xGetBackPredatorHessian(t);
     gradient_ = 0.;
-    gradient_ += xGetBackPredatorGradient(t);
-    yaw_ += Solver::solve(hessian_, 2*gradient_, wMax_, -wMax_)*t;
-    //yaw_ = std::atan2(yP_- y_, xP_- x_) + M_PI;
-    //Ca à l'air de marcher!!
 
+    // Compute weights
+    xGetBackPredatorWeight();
+    xGetPredatorDistanceWeight();
+
+
+    // Building hessian and gradient
+    // If none of the objectives have a significant influence, the agent just wander around
+ /*
+    if(backPredatorWeight_ < EPSILON)
+    {
+        hessian_ = xGetWanderAngleHessian(t);
+        gradient_ = xGetWanderAngleGradient(t);
+    }
+    else*/
+    {
+        hessian_ += backPredatorWeight_*xGetBackPredatorHessian(t);
+        gradient_ += backPredatorWeight_*xGetBackPredatorGradient(t);
+    }
+
+    // Updtating yaw coordinate
+    yaw_ += Solver::solve(hessian_, 2*gradient_, wMax_, -wMax_)*t;
+
+    // Reset gradient and hessian_
+    hessian_ = 0.;
+    gradient_ = 0.;
+/*
+    if(predatorDistanceWeight_ < EPSILON)
+    {
+        hessian_ = xGetWanderHessian(t);
+        gradient_ = xGetWanderGradient(t);
+    }
+    else*/
+    {
+        hessian_ += predatorDistanceWeight_*xGetPredatorDistanceHessian(t);
+        gradient_ += predatorDistanceWeight_*xGetPredatorDistanceHessian(t);
+    }
 
     // Updating x and y coordinate
-    hessian_ = 0.;
-    hessian_ += xGetPredatorDistanceHessian(t);
-    gradient_ = 0.;
-    gradient_ += xGetPredatorDistanceHessian(t);
-    //std::cout << "xGetVMaxBound "<<xGetVMaxBound(t) << std::endl;
-    //std::cout << "vMax_ "<<vMax_ << std::endl;
-    //std::cout << std::min(xGetVMaxBound(t), vMax_) << std::endl;
     Scalar sol = Solver::solve(hessian_, 2*gradient_, std::min(xGetVMaxBound(t), vMax_), 0.);
     x_ += sol*std::cos(yaw_)*t;
     y_ += sol*std::sin(yaw_)*t;
@@ -136,6 +160,12 @@ Scalar Agent::xGetMeanDirectionGradient(Scalar t)
     return t*(yaw_ - (1/(m + 1))*(meanYaw));
 }
 
+void Agent::xGetMeanDirectionWeight()
+{
+    meanDirectionWeight_ = 0;
+}
+
+
 Scalar Agent::xGetBackPredatorHessian(Scalar t)
 {
     return t*t;
@@ -143,10 +173,22 @@ Scalar Agent::xGetBackPredatorHessian(Scalar t)
 
 Scalar Agent::xGetBackPredatorGradient(Scalar t)
 {
-    return t*(wrapAngle(yaw_) - wrapAngle(std::atan2(yP_- y_, xP_- x_) + M_PI));
+    return t*(xWrapAngle(yaw_) - xWrapAngle(std::atan2(yP_- y_, xP_- x_) + M_PI));
 }
 
-
+void Agent::xGetBackPredatorWeight()
+{
+    if(std::pow((x_ - xP_), 2) + std::pow((y_ - yP_), 2) < std::pow(sightHorizon_, 2))
+        //TODO: sightHorizon_ pourrait être déterminé par l'algo gen
+    {
+        backPredatorWeight_ = 1;
+    }
+    else
+    {
+        backPredatorWeight_ = 0.;
+    }
+}
+0
 Scalar Agent::xGetBarycenterHessian(Scalar t)
 {
     return t*t;
@@ -179,6 +221,20 @@ Scalar Agent::xGetPredatorDistanceGradient(Scalar t)
     return t*(std::cos(yaw_)*(xP_ - x_) + std::sin(yaw_)*(yP_ - y_));
 }
 
+void Agent::xGetPredatorDistanceWeight()
+{
+    if(std::pow((x_ - xP_), 2) + std::pow((y_ - yP_), 2) < std::pow(sightHorizon_, 2))
+        //TODO: sightHorizon_ pourrait être déterminé par l'algo gen
+    {
+        predatorDistanceWeight_ = 1;
+    }
+    else
+    {
+        predatorDistanceWeight_ = 0.;
+    }
+}
+
+// TODO: delete?
 Scalar Agent::xGetLowSpeedHessian(Scalar t)
 {
     return 1.;
@@ -187,6 +243,53 @@ Scalar Agent::xGetLowSpeedHessian(Scalar t)
 Scalar Agent::xGetLowSpeedGradient(Scalar t)
 {
     return 0.;
+}
+
+Scalar Agent::xGetWanderAngleHessian(Scalar t)
+{
+    if(std::abs(x_ - box_.xMax_) < EPSILON ||
+       std::abs(x_ - box_.xMin_) < EPSILON ||
+       std::abs(y_ - box_.yMax_) < EPSILON ||
+       std::abs(y_ - box_.yMin_) < EPSILON)
+    {
+        return t*t;
+    }
+
+    return 1.;
+}
+
+Scalar Agent::xGetWanderAngleGradient(Scalar t)
+{
+    Scalar wrappedYaw = xWrapAngle(yaw_);
+
+    if(std::abs(x_ - box_.xMax_) < EPSILON)
+    {
+        return t*(wrappedYaw - M_PI);
+    }
+    else if(std::abs(x_ - box_.xMin_) < EPSILON)
+    {
+        return t*(wrappedYaw);
+    }
+    else if(std::abs(y_ - box_.yMax_) < EPSILON)
+    {
+        return t*(wrappedYaw - 3.*M_PI/2.);
+    }
+    else if(std::abs(y_ - box_.yMin_) < EPSILON)
+    {
+        return t*(wrappedYaw - M_PI/2.);
+    }
+
+    return 0.;
+}
+
+Scalar Agent::xGetWanderHessian(Scalar t)
+{
+    return 1.;
+}
+
+Scalar Agent::xGetWanderGradient(Scalar t)
+{
+    return vMax_/2.;
 }
 
 Scalar Agent::xGetVMaxBound(Scalar t)
@@ -240,7 +343,7 @@ Scalar Agent::xGetVMaxBound(Scalar t)
     }
 }
 
-Scalar Agent::wrapAngle(Scalar angle)
+Scalar Agent::xWrapAngle(Scalar angle)
 {
     return angle - 2*M_PI*std::floor(angle/(2*M_PI));
 }

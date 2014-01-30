@@ -63,20 +63,32 @@ public:
 private:
     Scalar xGetMeanDirectionHessian(Scalar t);
     Scalar xGetMeanDirectionGradient(Scalar t);
+    void xGetMeanDirectionWeight();
+
     Scalar xGetBackPredatorHessian(Scalar t);
     Scalar xGetBackPredatorGradient(Scalar t);
+    void xGetBackPredatorWeight();
 
     Scalar xGetBarycenterHessian(Scalar t);
     Scalar xGetBarycenterGradient(Scalar t);
+
     Scalar xGetPredatorDistanceHessian(Scalar t);
     Scalar xGetPredatorDistanceGradient(Scalar t);
+    void xGetPredatorDistanceWeight();
+
     Scalar xGetLowSpeedHessian(Scalar t);
     Scalar xGetLowSpeedGradient(Scalar t);
 
+    Scalar xGetWanderAngleHessian(Scalar t);
+    Scalar xGetWanderAngleGradient(Scalar t);
+    Scalar xGetWanderHessian(Scalar t);
+    Scalar xGetWanderGradient(Scalar t);
+
+    //Compute the maximum speed that the agent can reach
     Scalar xGetVMaxBound(Scalar t);
 
     // Wrap angle between 0 and 2Pi
-    Scalar wrapAngle(Scalar angle);
+    Scalar xWrapAngle(Scalar angle);
 
     // Agent coordinates and yaw angle
     Scalar x_;
@@ -105,6 +117,9 @@ private:
 
     Box box_;
 
+    Scalar meanDirectionWeight_;
+    Scalar backPredatorWeight_;
+    Scalar predatorDistanceWeight_;
 };
 
 #endif // AGENT_H

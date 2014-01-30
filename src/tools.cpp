@@ -8,7 +8,13 @@ Scalar Solver::solve(Scalar a,
              Scalar xMax,
              Scalar xMin)
 {
-    assert (a != 0);
+    assert (a != 0 || b == 0);
+
+    if(a == 0 && b == 0)
+    {
+        return 0;
+    }
+
     Scalar xStat = -b/(2*a);
 
     if(a>0)
