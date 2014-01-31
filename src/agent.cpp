@@ -188,7 +188,7 @@ void Agent::xGetBackPredatorWeight()
         backPredatorWeight_ = 0.;
     }
 }
-0
+
 Scalar Agent::xGetBarycenterHessian(Scalar t)
 {
     return t*t;

@@ -17,7 +17,7 @@ Experience::Experience(int nbAgent,
     ,agentVec_(nbAgent,
                Agent(v/2.,
                      M_PI/20.,//M_PI/16.,
-                     100,
+                     200,
                      3.*M_PI/4.,
                      box_))
 //http://stackoverflow.com/questions/2860673/initializing-a-c-vector-to-random-values-fast
