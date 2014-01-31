@@ -64,13 +64,14 @@ void Agent::updatePos(Scalar t)
 
     // Building hessian and gradient
     // If none of the objectives have a significant influence, the agent just wander around
- /*
+
     if(backPredatorWeight_ < EPSILON)
     {
+        //std::cout << "DUDE"<<std::endl;
         hessian_ = xGetWanderAngleHessian(t);
         gradient_ = xGetWanderAngleGradient(t);
     }
-    else*/
+    else
     {
         hessian_ += backPredatorWeight_*xGetBackPredatorHessian(t);
         gradient_ += backPredatorWeight_*xGetBackPredatorGradient(t);
@@ -82,13 +83,13 @@ void Agent::updatePos(Scalar t)
     // Reset gradient and hessian_
     hessian_ = 0.;
     gradient_ = 0.;
-/*
+
     if(predatorDistanceWeight_ < EPSILON)
     {
         hessian_ = xGetWanderHessian(t);
         gradient_ = xGetWanderGradient(t);
     }
-    else*/
+    else
     {
         hessian_ += predatorDistanceWeight_*xGetPredatorDistanceHessian(t);
         gradient_ += predatorDistanceWeight_*xGetPredatorDistanceHessian(t);
@@ -289,7 +290,7 @@ Scalar Agent::xGetWanderHessian(Scalar t)
 
 Scalar Agent::xGetWanderGradient(Scalar t)
 {
-    return vMax_/2.;
+    return -vMax_/2.;
 }
 
 Scalar Agent::xGetVMaxBound(Scalar t)
@@ -304,7 +305,7 @@ Scalar Agent::xGetVMaxBound(Scalar t)
         else if(std::sin(yaw_) < EPSILON)
         {
             return std::min((box_.xMax_ - x_)/(std::cos(yaw_)*t),
-                            (y_ - box_.yMax_)/(std::sin(yaw_)*t));
+                            (box_.yMin_ - y_)/(std::sin(yaw_)*t));
 
         }
         else
@@ -316,17 +317,17 @@ Scalar Agent::xGetVMaxBound(Scalar t)
     {
         if(std::sin(yaw_) > EPSILON)
         {
-            return std::min((x_ - box_.xMax_)/(std::cos(yaw_)*t),
+            return std::min((box_.xMin_ - x_)/(std::cos(yaw_)*t),
                             (box_.yMax_ - y_)/(std::sin(yaw_)*t));
         }
         else if(std::sin(yaw_) < EPSILON)
         {
-            return std::min((x_ - box_.xMax_)/(std::cos(yaw_)*t),
-                            (y_ - box_.yMax_)/(std::sin(yaw_)*t));
+            return std::min((box_.xMin_ - x_)/(std::cos(yaw_)*t),
+                            (box_.yMin_ - y_)/(std::sin(yaw_)*t));
         }
         else
         {
-            return (x_ - box_.xMax_)/(std::cos(yaw_)*t);
+            return (box_.xMin_ - x_)/(std::cos(yaw_)*t);
         }
     }
     else
@@ -337,7 +338,7 @@ Scalar Agent::xGetVMaxBound(Scalar t)
         }
         else
         {
-            return (y_ - box_.yMax_)/(std::sin(yaw_)*t);
+            return (box_.yMin_ - y_)/(std::sin(yaw_)*t);
         }
 
     }

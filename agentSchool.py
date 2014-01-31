@@ -12,7 +12,7 @@ red = ( 255, 0, 0)
 agentNumber = 50
 #TODO put predatorSize as a class parameter 
 predatorSize = [50, 50, 10]
-boxSize = [500., 500., -500., -500]
+boxSize = [500., 400., -500., -400]
 
 #Create a new experience
 exp = exp.Experience(agentNumber, 10., 0., 5., boxSize[0], boxSize[1], boxSize[2], boxSize[3])
@@ -20,7 +20,7 @@ exp = exp.Experience(agentNumber, 10., 0., 5., boxSize[0], boxSize[1], boxSize[2
 pygame.init()
 
 # Set the height and width of the aquarium
-size = [1050, 1050]
+size = [1100, 1200]
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Agent School")
 #Loop until the user clicks the close button.
@@ -41,10 +41,6 @@ while done == False:
 	for i in range(agentNumber):	
 		pygame.draw.ellipse(screen, red, [exp.getX(i) - boxSize[2], exp.getY(i) - boxSize[3], 30, 30], 10)
 		pygame.draw.line(screen, white, [exp.getX(i) - boxSize[2] + 30/2, exp.getY(i) - boxSize[3] + 30/2], [exp.getX(i) - boxSize[2] + 20*np.cos(exp.getYaw(i)) + 30/2, exp.getY(i) - boxSize[3] + 20*np.sin(exp.getYaw(i)) + 30/2], 5)
-		print 'X'		
-		print exp.getX(i) - boxSize[2]
-		print 'Y'		
-		print exp.getY(i) - boxSize[2]
 
 	exp.update(1.)
 	# Limit to 20 frames per second
