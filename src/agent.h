@@ -90,6 +90,9 @@ private:
     // Wrap angle between 0 and 2Pi
     Scalar xWrapAngle(Scalar angle);
 
+    // Add or deduct 2Pi from angle so that it is the closest value to reference
+    Scalar xGetClosestAngle(Scalar angle, Scalar reference);
+
     // Agent coordinates and yaw angle
     Scalar x_;
     Scalar y_;

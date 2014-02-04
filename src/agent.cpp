@@ -353,3 +353,23 @@ Scalar Agent::xWrapAngle(Scalar angle)
 {
     return angle - 2*M_PI*std::floor(angle/(2*M_PI));
 }
+
+Scalar Agent::xGetClosestAngle(Scalar angle, Scalar reference)
+{
+    if(std::abs(angle - reference) < M_PI)
+    {
+        return angle;
+    }
+    else
+    {
+        if(angle >= reference)
+        {
+            return angle - 2*M_PI;
+        }
+        else
+        {
+            return angle + 2*M_PI;
+        }
+    }
+}
+

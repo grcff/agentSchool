@@ -9,7 +9,7 @@ white = ( 255, 255, 255)
 green = ( 0, 255, 0)
 red = ( 255, 0, 0)
 
-agentNumber = 10
+agentNumber = 50
 #TODO put predatorSize as a class parameter 
 predatorSize = [50, 50, 10]
 boxSize = [500., 400., -500., -400]
