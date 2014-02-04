@@ -15,7 +15,8 @@ Experience::Experience(int nbAgent,
     :box_(xMax, yMax, xMin, yMin)
     ,predator_(xP, yP, v, box_)
     ,agentVec_(nbAgent,
-               Agent(v/2.,
+               Agent(30.,
+                     v/2.,
                      M_PI/20.,//M_PI/16.,
                      200,
                      3.*M_PI/4.,

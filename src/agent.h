@@ -9,11 +9,11 @@ class Agent
 public:
     // Constructors
     Agent();
-    Agent(Scalar vMax,
+    Agent(Scalar size,
+          Scalar vMax,
           Scalar wMax,
           Scalar sightHorizon,
-          Scalar sightMaxAngle,
-          Box box);
+          Scalar sightMaxAngle, Box box);
     // Destructor
     ~Agent();
 
@@ -107,6 +107,7 @@ private:
     Scalar xP_;
     Scalar yP_;
 
+    const Scalar size_;
     const Scalar vMax_;
     const Scalar wMax_;
     const Scalar sightHorizon_;

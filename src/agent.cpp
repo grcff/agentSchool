@@ -8,6 +8,7 @@ Agent::Agent()
     ,yaw_(0.)
     ,xP_(0.)
     ,yP_(0.)
+    ,size_(0.)
     ,vMax_(0.)
     ,wMax_(0.)
     ,sightHorizon_(0.)
@@ -21,7 +22,8 @@ Agent::Agent()
     nYawVec_.resize(0.);
 }
 
-Agent::Agent(Scalar vMax,
+Agent::Agent(Scalar size,
+             Scalar vMax,
              Scalar wMax,
              Scalar sightHorizon,
              Scalar sightMaxAngle,
@@ -31,6 +33,7 @@ Agent::Agent(Scalar vMax,
     ,yaw_(0.)
     ,xP_(0.)
     ,yP_(0.) //change to box.yMax_ + sightHorizon
+    ,size_(size)
     ,vMax_(vMax)
     ,wMax_(wMax)
     ,sightHorizon_(sightHorizon)
@@ -248,12 +251,13 @@ Scalar Agent::xGetLowSpeedGradient(Scalar t)
 
 Scalar Agent::xGetWanderAngleHessian(Scalar t)
 {
-    if(std::abs(x_ - box_.xMax_) < EPSILON ||
-       std::abs(x_ - box_.xMin_) < EPSILON ||
-       std::abs(y_ - box_.yMax_) < EPSILON ||
-       std::abs(y_ - box_.yMin_) < EPSILON)
+    Scalar d = size_/10.; // arbitrary...
+    if(std::abs(x_ - box_.xMax_) < d ||
+       std::abs(x_ - box_.xMin_) < d ||
+       std::abs(y_ - box_.yMax_) < d ||
+       std::abs(y_ - box_.yMin_) < d)
     {
-        return t*t;
+        return -t*t;
     }
 
     return 1.;
@@ -262,22 +266,23 @@ Scalar Agent::xGetWanderAngleHessian(Scalar t)
 Scalar Agent::xGetWanderAngleGradient(Scalar t)
 {
     Scalar wrappedYaw = xWrapAngle(yaw_);
+    Scalar d = size_/10.; // arbitrary...
 
-    if(std::abs(x_ - box_.xMax_) < EPSILON)
+    if(std::abs(x_ - box_.xMax_) < d)
     {
-        return t*(wrappedYaw - M_PI);
+        return -t*(wrappedYaw);;
     }
-    else if(std::abs(x_ - box_.xMin_) < EPSILON)
+    else if(std::abs(x_ - box_.xMin_) < d)
     {
-        return t*(wrappedYaw);
+        return -t*(wrappedYaw - M_PI);
     }
-    else if(std::abs(y_ - box_.yMax_) < EPSILON)
+    else if(std::abs(y_ - box_.yMax_) < d)
     {
-        return t*(wrappedYaw - 3.*M_PI/2.);
+        return -t*(wrappedYaw - M_PI/2.);
     }
-    else if(std::abs(y_ - box_.yMin_) < EPSILON)
+    else if(std::abs(y_ - box_.yMin_) < d)
     {
-        return t*(wrappedYaw - M_PI/2.);
+        return -t*(wrappedYaw - 3.*M_PI/2.);
     }
 
     return 0.;

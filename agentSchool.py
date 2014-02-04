@@ -9,7 +9,7 @@ white = ( 255, 255, 255)
 green = ( 0, 255, 0)
 red = ( 255, 0, 0)
 
-agentNumber = 50
+agentNumber = 10
 #TODO put predatorSize as a class parameter 
 predatorSize = [50, 50, 10]
 boxSize = [500., 400., -500., -400]
@@ -37,10 +37,20 @@ while done == False:
 	screen.fill(black)
 	# Draw the rectangle
 	pygame.draw.ellipse(screen, green, [exp.getXP() - boxSize[2], exp.getYP() - boxSize[3], predatorSize[0], predatorSize[1]], predatorSize[2])
+		
+	try:
+		for i in range(agentNumber):	
+			pygame.draw.ellipse(screen, red, [exp.getX(i) - boxSize[2], exp.getY(i) - boxSize[3], 30, 30], 10)
+			pygame.draw.line(screen, white, [exp.getX(i) - boxSize[2] + 30/2, exp.getY(i) - boxSize[3] + 30/2], [exp.getX(i) - boxSize[2] + 20*np.cos(exp.getYaw(i)) + 30/2, exp.getY(i) - boxSize[3] + 20*np.sin(exp.getYaw(i)) + 30/2], 5)
 	
-	for i in range(agentNumber):	
-		pygame.draw.ellipse(screen, red, [exp.getX(i) - boxSize[2], exp.getY(i) - boxSize[3], 30, 30], 10)
-		pygame.draw.line(screen, white, [exp.getX(i) - boxSize[2] + 30/2, exp.getY(i) - boxSize[3] + 30/2], [exp.getX(i) - boxSize[2] + 20*np.cos(exp.getYaw(i)) + 30/2, exp.getY(i) - boxSize[3] + 20*np.sin(exp.getYaw(i)) + 30/2], 5)
+	except TypeError:
+		print exp.getX(i) - boxSize[2]
+		print exp.getY(i) - boxSize[3]
+	"""
+	pygame.draw.ellipse(screen, red, [200, 200, 6, 6], 3)	
+	pygame.draw.line(screen, white, [200, 200], [200 + 20*np.cos(3.141/2.), 200 + 20*np.sin(3.141/2.)], 5)
+	pygame.draw.line(screen, green, [200, 200], [200 + 20*np.cos(3.141), 200 + 20*np.sin(3.141)], 5)
+	"""
 
 	exp.update(1.)
 	# Limit to 20 frames per second
