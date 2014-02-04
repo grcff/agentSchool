@@ -75,6 +75,7 @@ private:
 
     Scalar xGetBarycenterHessian(Scalar t);
     Scalar xGetBarycenterGradient(Scalar t);
+    void xGetBarycenterWeight();
 
     Scalar xGetPredatorDistanceHessian(Scalar t);
     Scalar xGetPredatorDistanceGradient(Scalar t);
@@ -119,6 +120,7 @@ private:
 
     Scalar meanDirectionWeight_;
     Scalar backPredatorWeight_;
+    Scalar barycenterWeight_;
     Scalar predatorDistanceWeight_;
 };
 

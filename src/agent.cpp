@@ -16,6 +16,10 @@ Agent::Agent()
     ,hessian_(0.)
     ,gradient_(0.)
     ,box_()
+    ,meanDirectionWeight_(0.)
+    ,backPredatorWeight_(0.)
+    ,barycenterWeight_(0.)
+    ,predatorDistanceWeight_(0.)
 {
     nXVec_.resize(0.);
     nYVec_.resize(0.);
@@ -41,6 +45,10 @@ Agent::Agent(Scalar size,
     ,hessian_(0.)
     ,gradient_(0.)
     ,box_(box)
+    ,meanDirectionWeight_(0.)
+    ,backPredatorWeight_(0.)
+    ,barycenterWeight_(0.)
+    ,predatorDistanceWeight_(0.)
 {
     assert(vMax > -EPSILON);
     assert(wMax > -EPSILON);
@@ -70,15 +78,14 @@ void Agent::updatePos(Scalar t)
     // Compute weights
     xGetBackPredatorWeight();
     xGetMeanDirectionWeight();
+    xGetBarycenterWeight();
     xGetPredatorDistanceWeight();
-
-    Scalar weightSum = backPredatorWeight_ + meanDirectionWeight_;
 
     /************ ANGLE ***********/
     // Building hessian and gradient
     // If none of the objectives have a significant influence, the agent just wander around
 
-    if(weightSum < EPSILON)
+    if(backPredatorWeight_ + meanDirectionWeight_ < EPSILON)
     {
         //std::cout << "DUDE"<<std::endl;
         hessian_ = xGetWanderAngleHessian(t);
@@ -100,15 +107,17 @@ void Agent::updatePos(Scalar t)
     hessian_ = 0.;
     gradient_ = 0.;
 
-    if(weightSum  < EPSILON)
+    if(predatorDistanceWeight_ + barycenterWeight_  < EPSILON)
     {
         hessian_ = xGetWanderHessian(t);
         gradient_ = xGetWanderGradient(t);
     }
     else
     {
-        hessian_ += predatorDistanceWeight_*xGetPredatorDistanceHessian(t);
-        gradient_ += predatorDistanceWeight_*xGetPredatorDistanceHessian(t);
+        hessian_ += predatorDistanceWeight_*xGetPredatorDistanceHessian(t)
+                    + barycenterWeight_*xGetBarycenterHessian(t);
+        gradient_ += predatorDistanceWeight_*xGetPredatorDistanceHessian(t)
+                     + barycenterWeight_*xGetBarycenterGradient(t);
     }
 
     // Updating x and y coordinate
@@ -175,7 +184,7 @@ Scalar Agent::xGetMeanDirectionGradient(Scalar t)
 
     for(int i=0; i<m; ++i)
     {
-        meanYaw += Tools::getClosestAngle(nYawVec_(i), yaw_);
+        meanYaw += /*Tools::getClosestAngle(*/nYawVec_(i)/*, yaw_)*/;
     }
 
     return t*(yaw_ - (1/(m + 1))*(meanYaw));
@@ -189,7 +198,7 @@ void Agent::xGetMeanDirectionWeight()
     }
     else
     {
-        meanDirectionWeight_ = 0.1;
+        meanDirectionWeight_ = 0.;
     }
 }
 
@@ -281,6 +290,18 @@ Scalar Agent::xGetBarycenterGradient(Scalar t)
 
     return t*(std::cos(yaw_)*(x_ - (1/(m + 1))*meanX) +
               std::sin(yaw_)*(y_ - (1/(m + 1))*meanY));
+}
+
+void Agent::xGetBarycenterWeight()
+{
+    if(nXVec_.rows() == 0)
+    {
+        barycenterWeight_ = 0.;
+    }
+    else
+    {
+        barycenterWeight_ = 0.1;
+    }
 }
 
 Scalar Agent::xGetPredatorDistanceHessian(Scalar t)
