@@ -18,8 +18,8 @@ Experience::Experience(int nbAgent,
                Agent(30.,
                      v/2.,
                      M_PI/20.,//M_PI/16.,
-                     200,
-                     3.*M_PI/4.,
+                     100,
+                     M_PI/4.,
                      box_))
 //http://stackoverflow.com/questions/2860673/initializing-a-c-vector-to-random-values-fast
 //http://stackoverflow.com/questions/6157409/stdvector-to-boostpythonlist
@@ -57,6 +57,7 @@ Scalar Experience::getYaw(int i)
     return yawVec_[i];
 }
 
+// TODO: delete ugly xVec and yVec
 void Experience::update(Scalar t)
 {
     predator_.updatePos(t);
@@ -72,6 +73,7 @@ void Experience::update(Scalar t)
 
 void Experience::xInit(int nbAgent, Scalar v)
 {
+    // Seed rand function
     srand(time(NULL));
 
     xVec_.resize(nbAgent);
@@ -97,7 +99,7 @@ void Experience::xUpdateEnvironment(int agentIndex)
 
     agent.setXP(predator_.getX());
     agent.setYP(predator_.getY());
-/*
+
     Scalar diffX(0.);
     Scalar diffY(0.);
 
@@ -105,23 +107,25 @@ void Experience::xUpdateEnvironment(int agentIndex)
     {
         if(i!=agentIndex)
         {
-            Agent& neighbor(agentVec_[j]);
+            const Agent& neighbor(agentVec_[i]);
             diffX = neighbor.getX() - agent.getX();
             diffY = neighbor.getY() - agent.getY();
 
-            if(std::abs(std::atan(diffY)/diffX - agent.getYaw()) < agent.getSightMaxAngle() &&
-                    std::abs(diffX*diffX + diffY*diffY) < agent.getSightHorizon())
+
+            // Here we fill the agent vector of neihbors
+            // atan2 gives an angle between -Pi and Pi, agent's yaw angle is wrapped between 0 and 2*Pi
+            // hence the wrapping of atan2
+            if(std::abs(Tools::getClosestAngle(Tools::wrapAngle(std::atan2(diffY, diffX)), agent.getYaw())
+                        - agent.getYaw()) < agent.getSightMaxAngle() &&
+               std::abs(diffX*diffX + diffY*diffY) < agent.getSightHorizon())
             {
-                int agent.getNVec().
-                        agent.setNVecSize()
+                agent.addNeigbor(neighbor);
             }
-
-
         }
-
     }
-*/
+
 }
+
 
 #include <boost/python.hpp>
 using namespace boost::python;

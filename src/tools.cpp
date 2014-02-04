@@ -3,7 +3,7 @@
 
 
 
-Scalar Solver::solve(Scalar a,
+Scalar Tools::solve(Scalar a,
              Scalar b,
              Scalar xMax,
              Scalar xMin)
@@ -47,5 +47,29 @@ Scalar Solver::solve(Scalar a,
             return std::abs(xStat - xMax)>std::abs(xStat - xMin)?xMax:xMin;
         }
 
+    }
+}
+
+Scalar Tools::wrapAngle(Scalar angle)
+{
+    return angle - 2*M_PI*std::floor(angle/(2*M_PI));
+}
+
+Scalar Tools::getClosestAngle(Scalar angle, Scalar reference)
+{
+    if(std::abs(angle - reference) < M_PI)
+    {
+        return angle;
+    }
+    else
+    {
+        if(angle >= reference)
+        {
+            return angle - 2*M_PI;
+        }
+        else
+        {
+            return angle + 2*M_PI;
+        }
     }
 }

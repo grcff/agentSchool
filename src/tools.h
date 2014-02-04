@@ -3,12 +3,18 @@
 
 #include "types.h"
 
-struct Solver
+namespace Tools
 {
 // Find x in order to minimize ax^2+bx under the constraint xMax < x < xMin
 static Scalar solve(Scalar a,
                     Scalar b,
                     Scalar xMax,
                     Scalar xMin);
-};
+
+// Wrap angle between 0 and 2Pi
+static Scalar wrapAngle(Scalar angle);
+
+// Add or deduct 2Pi from angle so that it is the closest value to reference
+static Scalar getClosestAngle(Scalar angle, Scalar reference);
+}
 #endif // TOOLS_H
