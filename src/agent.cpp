@@ -56,6 +56,9 @@ Agent::~Agent()
 
 void Agent::updatePos(Scalar t)
 {
+    // Wrap yaw_ between 0 and 2Pi
+    yaw_ = xWrapAngle(yaw_);
+
     // Reset gradient and hessian_
     hessian_ = 0.;
     gradient_ = 0.;
@@ -146,6 +149,10 @@ void Agent::setYP(Scalar yP)
     yP_ = yP;
 }
 
+/*********************************************/
+/******************** ANGLE ******************/
+/*********************************************/
+
 Scalar Agent::xGetMeanDirectionHessian(Scalar t)
 {
     return t*t;
@@ -177,7 +184,7 @@ Scalar Agent::xGetBackPredatorHessian(Scalar t)
 
 Scalar Agent::xGetBackPredatorGradient(Scalar t)
 {
-    return t*(xWrapAngle(yaw_) - xWrapAngle(std::atan2(yP_- y_, xP_- x_) + M_PI));
+    return t*(yaw_ - xGetClosestAngle(xWrapAngle(std::atan2(yP_- y_, xP_- x_) + M_PI), yaw_));
 }
 
 void Agent::xGetBackPredatorWeight()
@@ -192,6 +199,50 @@ void Agent::xGetBackPredatorWeight()
         backPredatorWeight_ = 0.;
     }
 }
+
+Scalar Agent::xGetWanderAngleHessian(Scalar t)
+{
+    Scalar d = size_/10.; // arbitrary...
+    if(std::abs(x_ - box_.xMax_) < d ||
+       std::abs(x_ - box_.xMin_) < d ||
+       std::abs(y_ - box_.yMax_) < d ||
+       std::abs(y_ - box_.yMin_) < d)
+    {
+        return -t*t;
+    }
+
+    return 1.;
+}
+
+Scalar Agent::xGetWanderAngleGradient(Scalar t)
+{
+    Scalar d = size_/10.; // arbitrary...
+
+    if(std::abs(x_ - box_.xMax_) < d)
+    {
+        return -t*(yaw_ - xGetClosestAngle(0., yaw_));
+    }
+    else if(std::abs(x_ - box_.xMin_) < d)
+    {
+        return -t*(yaw_ - xGetClosestAngle(M_PI, yaw_));
+    }
+    else if(std::abs(y_ - box_.yMax_) < d)
+    {
+        return -t*(yaw_ - xGetClosestAngle(M_PI/2., yaw_));
+    }
+    else if(std::abs(y_ - box_.yMin_) < d)
+    {
+        return -t*(yaw_ - xGetClosestAngle(3.*M_PI/2., yaw_));
+    }
+
+    return 0.;
+}
+
+
+/*********************************************/
+/**************** TRANSLATION ****************/
+/*********************************************/
+
 
 Scalar Agent::xGetBarycenterHessian(Scalar t)
 {
@@ -246,45 +297,6 @@ Scalar Agent::xGetLowSpeedHessian(Scalar t)
 
 Scalar Agent::xGetLowSpeedGradient(Scalar t)
 {
-    return 0.;
-}
-
-Scalar Agent::xGetWanderAngleHessian(Scalar t)
-{
-    Scalar d = size_/10.; // arbitrary...
-    if(std::abs(x_ - box_.xMax_) < d ||
-       std::abs(x_ - box_.xMin_) < d ||
-       std::abs(y_ - box_.yMax_) < d ||
-       std::abs(y_ - box_.yMin_) < d)
-    {
-        return -t*t;
-    }
-
-    return 1.;
-}
-
-Scalar Agent::xGetWanderAngleGradient(Scalar t)
-{
-    Scalar wrappedYaw = xWrapAngle(yaw_);
-    Scalar d = size_/10.; // arbitrary...
-
-    if(std::abs(x_ - box_.xMax_) < d)
-    {
-        return -t*(wrappedYaw);;
-    }
-    else if(std::abs(x_ - box_.xMin_) < d)
-    {
-        return -t*(wrappedYaw - M_PI);
-    }
-    else if(std::abs(y_ - box_.yMax_) < d)
-    {
-        return -t*(wrappedYaw - M_PI/2.);
-    }
-    else if(std::abs(y_ - box_.yMin_) < d)
-    {
-        return -t*(wrappedYaw - 3.*M_PI/2.);
-    }
-
     return 0.;
 }
 
