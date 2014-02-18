@@ -42,6 +42,11 @@ while done == False:
 		for i in range(agentNumber):	
 			pygame.draw.ellipse(screen, red, [exp.getX(i) - boxSize[2], exp.getY(i) - boxSize[3], 30, 30], 10)
 			pygame.draw.line(screen, white, [exp.getX(i) - boxSize[2] + 30/2, exp.getY(i) - boxSize[3] + 30/2], [exp.getX(i) - boxSize[2] + 20*np.cos(exp.getYaw(i)) + 30/2, exp.getY(i) - boxSize[3] + 20*np.sin(exp.getYaw(i)) + 30/2], 5)
+			
+			for j in range(exp.getNN(i)):
+				pygame.draw.line(screen, green, [exp.getX(i) - boxSize[2] + 30/2 + 5, exp.getY(i) - boxSize[3] + 30/2], [exp.getXN(i, j) - boxSize[2] + 30/2, exp.getYN(i, j) - boxSize[3] + 30/2], 2)
+				pygame.draw.line(screen, green, [exp.getX(i) - boxSize[2] + 30/2 - 5, exp.getY(i) - boxSize[3] + 30/2], [exp.getXN(i, j) - boxSize[2] + 30/2, exp.getYN(i, j) - boxSize[3] + 30/2], 2)
+			
 	
 	except TypeError:
 		print exp.getX(i) - boxSize[2]

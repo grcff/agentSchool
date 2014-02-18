@@ -18,8 +18,8 @@ Experience::Experience(int nbAgent,
                Agent(30.,
                      v/2.,
                      M_PI/20.,//M_PI/16.,
-                     100,
-                     M_PI/4.,
+                     200,
+                     M_PI/2.,
                      box_))
 //http://stackoverflow.com/questions/2860673/initializing-a-c-vector-to-random-values-fast
 //http://stackoverflow.com/questions/6157409/stdvector-to-boostpythonlist
@@ -56,6 +56,30 @@ Scalar Experience::getYaw(int i)
 {
     return yawVec_[i];
 }
+//DEBUG:
+int Experience::getNN(int i)
+{
+    return agentVec_[i].getXVec().rows();
+}
+
+Scalar Experience::getXN(int i, int j)
+{
+    return agentVec_[i].getXVec()[j];
+}
+
+Scalar Experience::getYN(int i, int j)
+{
+    return agentVec_[i].getYVec()[j];
+}
+
+Scalar Experience::getYawN(int i, int j)
+{
+    return agentVec_[i].getYawVec()[j];
+}
+
+
+Scalar getYneig(int i, int j);
+Scalar getYawNeig(int i, int j);
 
 // TODO: delete ugly xVec and yVec
 void Experience::update(Scalar t)
@@ -100,6 +124,8 @@ void Experience::xUpdateEnvironment(int agentIndex)
     agent.setXP(predator_.getX());
     agent.setYP(predator_.getY());
 
+    agent.cleanNeigborVectors();
+
     Scalar diffX(0.);
     Scalar diffY(0.);
 
@@ -117,7 +143,7 @@ void Experience::xUpdateEnvironment(int agentIndex)
             // hence the wrapping of atan2
             if(std::abs(Tools::getClosestAngle(Tools::wrapAngle(std::atan2(diffY, diffX)), agent.getYaw())
                         - agent.getYaw()) < agent.getSightMaxAngle() &&
-               std::abs(diffX*diffX + diffY*diffY) < agent.getSightHorizon())
+               std::abs(std::pow(diffX, 2) + std::pow(diffY, 2)) < std::pow(agent.getSightHorizon(), 2))
             {
                 agent.addNeigbor(neighbor);
             }
@@ -144,6 +170,11 @@ BOOST_PYTHON_MODULE(experience)
             .def("getY", &Experience::getY)
             .def("getYaw", &Experience::getYaw)
             .def("update", &Experience::update)
+            //DEBUG:
+            .def("getNN", &Experience::getNN)
+            .def("getXN", &Experience::getXN)
+            .def("getYN", &Experience::getYN)
+            .def("getYawN", &Experience::getYawN)
             ;
 
 };

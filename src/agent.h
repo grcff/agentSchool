@@ -24,9 +24,14 @@ public:
     void setX(Scalar x);
     void setY(Scalar y);
     void setYaw(Scalar yaw);
-    void addNeigbor(const Agent& agent);
+
     void setXP(Scalar xP);
     void setYP(Scalar yP);
+
+    //Managing neighbors
+    // Reset neighbors vectors
+    void cleanNeigborVectors();
+    void addNeigbor(const Agent& agent);
 
     // Getters
     inline Scalar getX() const
@@ -57,8 +62,7 @@ public:
     {return sightHorizon_;}
 
     inline const Scalar getSightMaxAngle() const
-    {return sightMaxAngle_;}
-
+    {return sightMaxAngle_;}  
 
 private:
     Scalar xGetMeanDirectionHessian(Scalar t);
@@ -120,8 +124,10 @@ private:
 
     Scalar meanDirectionWeight_;
     Scalar backPredatorWeight_;
+    Scalar wanderAngleWeight_;
     Scalar barycenterWeight_;
     Scalar predatorDistanceWeight_;
+    Scalar wanderWeight_;
 };
 
 #endif // AGENT_H

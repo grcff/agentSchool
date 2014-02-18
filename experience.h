@@ -26,6 +26,13 @@ public:
     Scalar getY(int i);
     Scalar getYaw(int i);
 
+    //DEBUG:
+    int getNN(int i);
+    Scalar getXN(int i, int j);
+    Scalar getYN(int i, int j);
+    Scalar getYawN(int i, int j);
+
+
     void update(Scalar t);
 
 private:
