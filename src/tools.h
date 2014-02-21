@@ -17,4 +17,7 @@ static Scalar wrapAngle(Scalar angle);
 // Add or deduct 2Pi from angle so that it is the closest value to reference
 static Scalar getClosestAngle(Scalar angle, Scalar reference);
 }
+
+//Compute the value in x of a sigmoid of parameter a
+static Scalar sigmoid(Scalar a, Scalar x);
 #endif // TOOLS_H

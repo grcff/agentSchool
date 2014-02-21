@@ -80,13 +80,11 @@ void Agent::updatePos(Scalar t)
     // Compute weights
     xGetBackPredatorWeight();
     xGetMeanDirectionWeight();
-    wanderAngleWeight_ = 1/(backPredatorWeight_ + meanDirectionWeight_ + EPSILON);
-    wanderAngleWeight_ = 1;
+    xGetWanderAngleWeight();
 
     xGetBarycenterWeight();
     xGetPredatorDistanceWeight();
-    wanderWeight_ = 1/(barycenterWeight_ + predatorDistanceWeight_ + EPSILON);
-wanderWeight_ = 1;
+    xGetWanderWeight();
 
     /************ ANGLE ***********/
     // Building hessian and gradient
@@ -169,6 +167,7 @@ void Agent::addNeigbor(const Agent& agent)
     nXVec_(oldSize) = agent.getX();
     nYVec_(oldSize) = agent.getY();
     nYawVec_(oldSize) = agent.getYaw();
+    nIsTooClose
 }
 
 /*********************************************/
@@ -235,6 +234,24 @@ void Agent::xGetBackPredatorWeight()
     }
 }
 
+Scalar Agent::xGetAntiStackingHessian(Scalar t)
+{
+
+
+    return t*t;
+}
+
+Scalar Agent::xGetAntiStackingGradient(Scalar t)
+{
+    return t*(yaw_ - Tools::getClosestAngle(Tools::wrapAngle(std::atan2(yP_- y_, xP_- x_) + M_PI), yaw_));
+}
+
+void Agent::xGetAntiStackingWeight()
+{
+
+}
+
+
 Scalar Agent::xGetWanderAngleHessian(Scalar t)
 {
     Scalar d = size_/10.; // arbitrary...
@@ -273,6 +290,11 @@ Scalar Agent::xGetWanderAngleGradient(Scalar t)
     return 0.;
 }
 
+
+void Agent::xGetWanderAngleWeight()
+{
+    wanderAngleWeight_ = 1;
+}
 
 /*********************************************/
 /**************** TRANSLATION ****************/
@@ -360,7 +382,12 @@ Scalar Agent::xGetWanderHessian(Scalar t)
 
 Scalar Agent::xGetWanderGradient(Scalar t)
 {
-    return -vMax_/1.2; //arbitrary...
+    return -vMax_/1.5; //arbitrary...
+}
+
+void Agent::xGetWanderWeight()
+{
+    wanderWeight_ = 1;
 }
 
 Scalar Agent::xGetVMaxBound(Scalar t)

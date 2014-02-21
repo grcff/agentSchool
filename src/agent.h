@@ -75,7 +75,7 @@ private:
 
     Scalar xGetWanderAngleHessian(Scalar t);
     Scalar xGetWanderAngleGradient(Scalar t);
-
+    void xGetWanderAngleWeight();
 
     Scalar xGetBarycenterHessian(Scalar t);
     Scalar xGetBarycenterGradient(Scalar t);
@@ -87,6 +87,7 @@ private:
 
     Scalar xGetWanderHessian(Scalar t);
     Scalar xGetWanderGradient(Scalar t);
+    void xGetWanderWeight();
 
     //Compute the maximum speed that the agent can reach
     Scalar xGetVMaxBound(Scalar t);
