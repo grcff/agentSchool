@@ -360,7 +360,7 @@ Scalar Agent::xGetWanderHessian(Scalar t)
 
 Scalar Agent::xGetWanderGradient(Scalar t)
 {
-    return -vMax_/1.2.; //arbitrary...
+    return -vMax_/1.2; //arbitrary...
 }
 
 Scalar Agent::xGetVMaxBound(Scalar t)
