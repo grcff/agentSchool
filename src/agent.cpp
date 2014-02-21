@@ -81,11 +81,12 @@ void Agent::updatePos(Scalar t)
     xGetBackPredatorWeight();
     xGetMeanDirectionWeight();
     wanderAngleWeight_ = 1/(backPredatorWeight_ + meanDirectionWeight_ + EPSILON);
+    wanderAngleWeight_ = 1;
 
     xGetBarycenterWeight();
     xGetPredatorDistanceWeight();
     wanderWeight_ = 1/(barycenterWeight_ + predatorDistanceWeight_ + EPSILON);
-
+wanderWeight_ = 1;
 
     /************ ANGLE ***********/
     // Building hessian and gradient
@@ -352,17 +353,6 @@ void Agent::xGetPredatorDistanceWeight()
     }
 }
 
-// TODO: delete?
-Scalar Agent::xGetLowSpeedHessian(Scalar t)
-{
-    return 1.;
-}
-
-Scalar Agent::xGetLowSpeedGradient(Scalar t)
-{
-    return 0.;
-}
-
 Scalar Agent::xGetWanderHessian(Scalar t)
 {
     return 1.;
@@ -370,7 +360,7 @@ Scalar Agent::xGetWanderHessian(Scalar t)
 
 Scalar Agent::xGetWanderGradient(Scalar t)
 {
-    return -vMax_/3.;
+    return -vMax_/1.2.; //arbitrary...
 }
 
 Scalar Agent::xGetVMaxBound(Scalar t)

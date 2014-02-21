@@ -17,8 +17,8 @@ Experience::Experience(int nbAgent,
     ,agentVec_(nbAgent,
                Agent(30.,
                      v/2.,
-                     M_PI/20.,//M_PI/16.,
-                     200,
+                     M_PI/60.,//M_PI/16.,
+                     100,
                      M_PI/2.,
                      box_))
 //http://stackoverflow.com/questions/2860673/initializing-a-c-vector-to-random-values-fast
@@ -143,7 +143,7 @@ void Experience::xUpdateEnvironment(int agentIndex)
             // hence the wrapping of atan2
             if(std::abs(Tools::getClosestAngle(Tools::wrapAngle(std::atan2(diffY, diffX)), agent.getYaw())
                         - agent.getYaw()) < agent.getSightMaxAngle() &&
-               std::abs(std::pow(diffX, 2) + std::pow(diffY, 2)) < std::pow(100*agent.getSightHorizon(), 2))
+               std::abs(std::pow(diffX, 2) + std::pow(diffY, 2)) < std::pow(agent.getSightHorizon(), 2))
             {
                 agent.addNeigbor(neighbor);
             }

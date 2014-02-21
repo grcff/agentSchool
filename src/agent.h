@@ -85,9 +85,6 @@ private:
     Scalar xGetPredatorDistanceGradient(Scalar t);
     void xGetPredatorDistanceWeight();
 
-    Scalar xGetLowSpeedHessian(Scalar t);
-    Scalar xGetLowSpeedGradient(Scalar t);
-
     Scalar xGetWanderHessian(Scalar t);
     Scalar xGetWanderGradient(Scalar t);
 
