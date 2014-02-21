@@ -143,7 +143,7 @@ void Experience::xUpdateEnvironment(int agentIndex)
             // hence the wrapping of atan2
             if(std::abs(Tools::getClosestAngle(Tools::wrapAngle(std::atan2(diffY, diffX)), agent.getYaw())
                         - agent.getYaw()) < agent.getSightMaxAngle() &&
-               std::abs(std::pow(diffX, 2) + std::pow(diffY, 2)) < std::pow(agent.getSightHorizon(), 2))
+               std::abs(std::pow(diffX, 2) + std::pow(diffY, 2)) < std::pow(100*agent.getSightHorizon(), 2))
             {
                 agent.addNeigbor(neighbor);
             }

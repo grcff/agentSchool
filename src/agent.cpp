@@ -1,6 +1,8 @@
 #include "agent.h"
 #include "tools.cpp"
 #include <stdio.h>
+//DEBUG
+#include <typeinfo>
 
 Agent::Agent()
     :x_(0.)
@@ -79,6 +81,7 @@ void Agent::updatePos(Scalar t)
     xGetBackPredatorWeight();
     xGetMeanDirectionWeight();
     wanderAngleWeight_ = 1/(backPredatorWeight_ + meanDirectionWeight_ + EPSILON);
+
     xGetBarycenterWeight();
     xGetPredatorDistanceWeight();
     wanderWeight_ = 1/(barycenterWeight_ + predatorDistanceWeight_ + EPSILON);
@@ -96,11 +99,6 @@ void Agent::updatePos(Scalar t)
             + wanderAngleWeight_*xGetWanderAngleGradient(t) ;
 
     // Updtating yaw coordinate
-    //DEBUG
-    if(std::abs(Tools::solve(hessian_, 2*gradient_, wMax_, -wMax_)*t) > M_PI/20.)
-    {
-        std::cout << "PROBLEM"<< std::endl;
-    }
     yaw_ += Tools::solve(hessian_, 2*gradient_, wMax_, -wMax_)*t;
 
     /************ TRANSLATION ***********/
@@ -113,7 +111,13 @@ void Agent::updatePos(Scalar t)
 
     // Updating x and y coordinate
     Scalar sol = Tools::solve(hessian_, 2*gradient_, std::min(xGetVMaxBound(t), vMax_), 0.);
-    x_ += sol*std::cos(yaw_)*t;
+
+    /*
+    std::cout << "sol: " << sol<< std::endl;
+    std::cout << "solSupposée: " << -gradient_/hessian_<< std::endl;
+    std::cout << "min: " << std::min(xGetVMaxBound(t), vMax_)<< std::endl;
+  */
+  x_ += sol*std::cos(yaw_)*t;
     y_ += sol*std::sin(yaw_)*t;
 }
 
@@ -181,14 +185,14 @@ Scalar Agent::xGetMeanDirectionGradient(Scalar t)
 
     if(m>0)
     {
-        Scalar meanYaw = 0.;//yaw_;
+        Scalar meanYaw = yaw_;
 
         for(int i=0; i<m; ++i)
         {
             meanYaw += Tools::getClosestAngle(nYawVec_(i), yaw_);
         }
 
-        return t*(yaw_ - (1/m)*meanYaw);
+        return t*(yaw_ - (1/static_cast<Scalar>(m+1))*meanYaw);
     }
 
     return 0.;
@@ -202,7 +206,7 @@ void Agent::xGetMeanDirectionWeight()
     }
     else
     {
-        meanDirectionWeight_ = 0.;
+        meanDirectionWeight_ = 10.;
     }
 }
 
@@ -222,7 +226,7 @@ void Agent::xGetBackPredatorWeight()
     if(std::pow((x_ - xP_), 2) + std::pow((y_ - yP_), 2) < std::pow(sightHorizon_, 2))
         //TODO: sightHorizon_ pourrait être déterminé par l'algo gen
     {
-        backPredatorWeight_ = 0.;
+        backPredatorWeight_ = 100.;
     }
     else
     {
@@ -291,9 +295,26 @@ Scalar Agent::xGetBarycenterGradient(Scalar t)
         meanX += nXVec_(i);
         meanY += nYVec_(i);
     }
+//DEBUG
+    if(t*(std::cos(yaw_)*(x_ - (1/(m + 1))*meanX) +
+          std::sin(yaw_)*(y_ - (1/(m + 1))*meanY)) < 0)
+    {
+        std::cout << "<0!!!! " << std::endl;
+        std::cout << "yaw: " << yaw_ << std::endl;
+    std::cout << "x y: " << x_ << " "<< y_ << std::endl;
+    std::cout << "Xg Yg" << static_cast<Scalar>(1/(m + 1))*meanX << " " <<static_cast<Scalar>(1/(m + 1))*meanY << std::endl;
+    if(std::abs(static_cast<Scalar>(1/(m + 1))*meanX)<EPSILON && std::abs(static_cast<Scalar>(1/(m + 1))*meanY)<EPSILON)
+    {
+        std::cout<<"m="<<m<<std::endl;
+        std::cout<<"1/(m+1)"<<static_cast<Scalar>(1/(m + 1))<<std::endl;
+    std::cout<<"meanX="<<meanX<< typeid(meanX).name()<<std::endl;
+    std::cout<<"meanY="<<meanY<< typeid(meanY).name()<<std::endl;
+    }
+    }
 
-    return t*(std::cos(yaw_)*(x_ - (1/(m + 1))*meanX) +
-              std::sin(yaw_)*(y_ - (1/(m + 1))*meanY));
+
+    return t*(std::cos(yaw_)*(x_ - (1./static_cast<Scalar>(m + 1))*meanX) +
+              std::sin(yaw_)*(y_ - (1./static_cast<Scalar>(m + 1))*meanY));
 }
 
 void Agent::xGetBarycenterWeight()
@@ -323,7 +344,7 @@ void Agent::xGetPredatorDistanceWeight()
     if(std::pow((x_ - xP_), 2) + std::pow((y_ - yP_), 2) < std::pow(sightHorizon_, 2))
         //TODO: sightHorizon_ pourrait être déterminé par l'algo gen
     {
-        predatorDistanceWeight_ = 0.;
+        predatorDistanceWeight_ = 100.;
     }
     else
     {
