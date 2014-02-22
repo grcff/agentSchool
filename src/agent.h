@@ -1,6 +1,7 @@
 #ifndef AGENT_H
 #define AGENT_H
 #include <iostream>
+#include <vector>
 #include "types.h"
 #include "tools.h"
 
@@ -28,9 +29,9 @@ public:
     void setXP(Scalar xP);
     void setYP(Scalar yP);
 
-    //Managing neighbors
     // Reset neighbors vectors
     void cleanNeigborVectors();
+    // Add a neighbor
     void addNeigbor(const Agent& agent);
 
     // Getters
@@ -43,13 +44,13 @@ public:
     inline Scalar getYaw() const
     {return yaw_;}
 
-    inline const VectorX& getXVec() const
+    inline const std::vector<Scalar>& getXVec() const
     {return nXVec_;}
 
-    inline const VectorX& getYVec() const
+    inline const std::vector<Scalar>& getYVec() const
     {return nYVec_;}
 
-    inline const VectorX& getYawVec() const
+    inline const std::vector<Scalar>& getYawVec() const
     {return nYawVec_;}
 
     inline const Scalar getVMax() const
@@ -65,6 +66,7 @@ public:
     {return sightMaxAngle_;}  
 
 private:
+    //Compute hessian and gradient of each objective of the quadratic problem that drives agent's behavior
     Scalar xGetMeanDirectionHessian(Scalar t);
     Scalar xGetMeanDirectionGradient(Scalar t);
     void xGetMeanDirectionWeight();
@@ -85,6 +87,10 @@ private:
     Scalar xGetPredatorDistanceGradient(Scalar t);
     void xGetPredatorDistanceWeight();
 
+    Scalar xGetAntiStackingHessian(Scalar t);
+    Scalar xGetAntiStackingGradient(Scalar t);
+    void xGetAntiStackingWeight();
+
     Scalar xGetWanderHessian(Scalar t);
     Scalar xGetWanderGradient(Scalar t);
     void xGetWanderWeight();
@@ -101,9 +107,9 @@ private:
     // First column are neighbors's x coordinate
     // Second column are neighbors's y coordinate
     // Third column are neighbors's yaw coordinate
-    VectorX nXVec_;
-    VectorX nYVec_;
-    VectorX nYawVec_;
+    std::vector<Scalar> nXVec_;
+    std::vector<Scalar> nYVec_;
+    std::vector<Scalar> nYawVec_;
 
     //Position of the predator
     Scalar xP_;
@@ -125,6 +131,7 @@ private:
     Scalar wanderAngleWeight_;
     Scalar barycenterWeight_;
     Scalar predatorDistanceWeight_;
+    std::vector<Scalar> antiStackWeightVec_;
     Scalar wanderWeight_;
 };
 

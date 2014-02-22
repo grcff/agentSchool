@@ -28,6 +28,7 @@ Agent::Agent()
     nXVec_.resize(0.);
     nYVec_.resize(0.);
     nYawVec_.resize(0.);
+    antiStackWeightVec_.resize(0.);
 }
 
 Agent::Agent(Scalar size,
@@ -84,12 +85,11 @@ void Agent::updatePos(Scalar t)
 
     xGetBarycenterWeight();
     xGetPredatorDistanceWeight();
+    xGetAntiStackingWeight();
     xGetWanderWeight();
 
     /************ ANGLE ***********/
     // Building hessian and gradient
-    // If none of the objectives have a significant influence, the agent just wander around
-
     hessian_ = backPredatorWeight_*xGetBackPredatorHessian(t)
             + meanDirectionWeight_*xGetMeanDirectionHessian(t)
             + wanderAngleWeight_*xGetWanderAngleHessian(t);
@@ -111,12 +111,7 @@ void Agent::updatePos(Scalar t)
     // Updating x and y coordinate
     Scalar sol = Tools::solve(hessian_, 2*gradient_, std::min(xGetVMaxBound(t), vMax_), 0.);
 
-    /*
-    std::cout << "sol: " << sol<< std::endl;
-    std::cout << "solSupposée: " << -gradient_/hessian_<< std::endl;
-    std::cout << "min: " << std::min(xGetVMaxBound(t), vMax_)<< std::endl;
-  */
-  x_ += sol*std::cos(yaw_)*t;
+    x_ += sol*std::cos(yaw_)*t;
     y_ += sol*std::sin(yaw_)*t;
 }
 
@@ -160,14 +155,13 @@ void Agent::cleanNeigborVectors()
 
 void Agent::addNeigbor(const Agent& agent)
 {
-    int oldSize = nXVec_.rows();
-    nXVec_.conservativeResize(oldSize + 1);
-    nYVec_.conservativeResize(oldSize + 1);
-    nYawVec_.conservativeResize(oldSize + 1);
-    nXVec_(oldSize) = agent.getX();
-    nYVec_(oldSize) = agent.getY();
-    nYawVec_(oldSize) = agent.getYaw();
-    nIsTooClose
+    size_t oldSize = nXVec_.size();
+    nXVec_.resize(oldSize + 1);
+    nYVec_.resize(oldSize + 1);
+    nYawVec_.resize(oldSize + 1);
+    nXVec_[oldSize] = agent.getX();
+    nYVec_[oldSize] = agent.getY();
+    nYawVec_[oldSize] = agent.getYaw();
 }
 
 /*********************************************/
@@ -181,15 +175,15 @@ Scalar Agent::xGetMeanDirectionHessian(Scalar t)
 
 Scalar Agent::xGetMeanDirectionGradient(Scalar t)
 {
-    int m = nYawVec_.rows();
+    size_t m = nYawVec_.size();
 
     if(m>0)
     {
         Scalar meanYaw = yaw_;
 
-        for(int i=0; i<m; ++i)
+        for(size_t i=0; i<m; ++i)
         {
-            meanYaw += Tools::getClosestAngle(nYawVec_(i), yaw_);
+            meanYaw += Tools::getClosestAngle(nYawVec_[i], yaw_);
         }
 
         return t*(yaw_ - (1/static_cast<Scalar>(m+1))*meanYaw);
@@ -200,7 +194,7 @@ Scalar Agent::xGetMeanDirectionGradient(Scalar t)
 
 void Agent::xGetMeanDirectionWeight()
 {
-    if(nYawVec_.rows() == 0)
+    if(nYawVec_.size() == 0)
     {
         meanDirectionWeight_ = 0.;
     }
@@ -223,7 +217,7 @@ Scalar Agent::xGetBackPredatorGradient(Scalar t)
 
 void Agent::xGetBackPredatorWeight()
 {
-    if(std::pow((x_ - xP_), 2) + std::pow((y_ - yP_), 2) < std::pow(sightHorizon_, 2))
+    if(std::pow((x_ - xP_), 2) + std::pow((y_ - yP_), 2) < std::pow(2*sightHorizon_, 2))
         //TODO: sightHorizon_ pourrait être déterminé par l'algo gen
     {
         backPredatorWeight_ = 100.;
@@ -233,24 +227,6 @@ void Agent::xGetBackPredatorWeight()
         backPredatorWeight_ = 0.;
     }
 }
-
-Scalar Agent::xGetAntiStackingHessian(Scalar t)
-{
-
-
-    return t*t;
-}
-
-Scalar Agent::xGetAntiStackingGradient(Scalar t)
-{
-    return t*(yaw_ - Tools::getClosestAngle(Tools::wrapAngle(std::atan2(yP_- y_, xP_- x_) + M_PI), yaw_));
-}
-
-void Agent::xGetAntiStackingWeight()
-{
-
-}
-
 
 Scalar Agent::xGetWanderAngleHessian(Scalar t)
 {
@@ -309,32 +285,15 @@ Scalar Agent::xGetBarycenterHessian(Scalar t)
 Scalar Agent::xGetBarycenterGradient(Scalar t)
 {
 
-    int m = nXVec_.rows();
+    size_t m = nXVec_.size();
     Scalar meanX = x_;
     Scalar meanY = y_;
 
-    for(int i=0; i<m; ++i)
+    for(size_t i=0; i<m; ++i)
     {
-        meanX += nXVec_(i);
-        meanY += nYVec_(i);
+        meanX += nXVec_[i];
+        meanY += nYVec_[i];
     }
-//DEBUG
-    if(t*(std::cos(yaw_)*(x_ - (1/(m + 1))*meanX) +
-          std::sin(yaw_)*(y_ - (1/(m + 1))*meanY)) < 0)
-    {
-        std::cout << "<0!!!! " << std::endl;
-        std::cout << "yaw: " << yaw_ << std::endl;
-    std::cout << "x y: " << x_ << " "<< y_ << std::endl;
-    std::cout << "Xg Yg" << static_cast<Scalar>(1/(m + 1))*meanX << " " <<static_cast<Scalar>(1/(m + 1))*meanY << std::endl;
-    if(std::abs(static_cast<Scalar>(1/(m + 1))*meanX)<EPSILON && std::abs(static_cast<Scalar>(1/(m + 1))*meanY)<EPSILON)
-    {
-        std::cout<<"m="<<m<<std::endl;
-        std::cout<<"1/(m+1)"<<static_cast<Scalar>(1/(m + 1))<<std::endl;
-    std::cout<<"meanX="<<meanX<< typeid(meanX).name()<<std::endl;
-    std::cout<<"meanY="<<meanY<< typeid(meanY).name()<<std::endl;
-    }
-    }
-
 
     return t*(std::cos(yaw_)*(x_ - (1./static_cast<Scalar>(m + 1))*meanX) +
               std::sin(yaw_)*(y_ - (1./static_cast<Scalar>(m + 1))*meanY));
@@ -342,7 +301,7 @@ Scalar Agent::xGetBarycenterGradient(Scalar t)
 
 void Agent::xGetBarycenterWeight()
 {
-    if(nXVec_.rows() == 0)
+    if(nXVec_.size() == 0)
     {
         barycenterWeight_ = 0.;
     }
@@ -375,6 +334,29 @@ void Agent::xGetPredatorDistanceWeight()
     }
 }
 
+//TODO: complete
+Scalar Agent::xGetAntiStackingHessian(Scalar t)
+{
+    return 0.;
+}
+//TODO: complete
+Scalar Agent::xGetAntiStackingGradient(Scalar t)
+{
+    return 0.;
+}
+
+//TODO: complete
+void Agent::xGetAntiStackingWeight()
+{
+    size_t m = nYawVec_.size();
+    antiStackWeightVec_.resize(m);
+    for(size_t i=0; i<m; i++)
+    {
+        //antiStackWeightVec_[i] = Tools::sigmoid(1000, 25, )
+    }
+}
+
+
 Scalar Agent::xGetWanderHessian(Scalar t)
 {
     return 1.;
@@ -398,24 +380,17 @@ Scalar Agent::xGetVMaxBound(Scalar t)
     {
         if(std::sin(yaw_) > EPSILON)
         {
-            //std::cout << "a1"<<std::endl;
             return std::min((box_.xMax_ - d - x_)/(std::cos(yaw_)*t),
                             (box_.yMax_ - d - y_)/(std::sin(yaw_)*t));
 
         }
         else if(std::sin(yaw_) < -EPSILON)
         {
-
-            //std::cout << "a2"<<std::endl;
-            //std::cout << std::cos(yaw_)<<std::endl;
-            //std::cout << std::sin(yaw_)<<std::endl;
             return std::min((box_.xMax_ - d - x_)/(std::cos(yaw_)*t),
                             (box_.yMin_ + d - y_)/(std::sin(yaw_)*t));
-
         }
         else
         {
-            //std::cout << "a3"<<std::endl;
             return (box_.xMax_ - d - x_)/(std::cos(yaw_)*t);
         }
     }
@@ -423,19 +398,16 @@ Scalar Agent::xGetVMaxBound(Scalar t)
     {
         if(std::sin(yaw_) > EPSILON)
         {
-            //std::cout << "a4"<<std::endl;
             return std::min((box_.xMin_ + d - x_)/(std::cos(yaw_)*t),
                             (box_.yMax_ - d - y_)/(std::sin(yaw_)*t));
         }
         else if(std::sin(yaw_) < -EPSILON)
         {
-            //std::cout << "a5"<<std::endl;
             return std::min((box_.xMin_ + d - x_)/(std::cos(yaw_)*t),
                             (box_.yMin_ + d - y_)/(std::sin(yaw_)*t));
         }
         else
         {
-            //std::cout << "a6"<<std::endl;
             return (box_.xMin_ + d - x_)/(std::cos(yaw_)*t);
         }
     }
@@ -443,15 +415,12 @@ Scalar Agent::xGetVMaxBound(Scalar t)
     {
         if(std::sin(yaw_) > EPSILON)
         {
-            //std::cout << "a7"<<std::endl;
             return (box_.yMax_ -d - y_)/(std::sin(yaw_)*t);
         }
         else
         {
-            //std::cout << "a8"<<std::endl;
             return (box_.yMin_ + d - y_)/(std::sin(yaw_)*t);
         }
-
     }
 }
 

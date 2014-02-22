@@ -74,8 +74,8 @@ Scalar Tools::getClosestAngle(Scalar angle, Scalar reference)
     }
 }
 
-Scalar Tools::sigmoid(Scalar a, Scalar x)
+Scalar Tools::sigmoid(Scalar a, Scalar b, Scalar x)
 {
-    return 1/(1 + std::exp(-a*x));
+    return 1/(1 + std::exp(-a*(x - b)));
 }
 

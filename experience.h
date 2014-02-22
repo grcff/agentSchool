@@ -17,7 +17,7 @@ public:
                Scalar yMin);
     ~Experience();
 
-    //tester avec const après
+    // TODO: tester avec const après
 
     Scalar getXP();
     Scalar getYP();
@@ -27,7 +27,7 @@ public:
     Scalar getYaw(int i);
 
     //DEBUG:
-    int getNN(int i);
+    size_t getNN(int i);
     Scalar getXN(int i, int j);
     Scalar getYN(int i, int j);
     Scalar getYawN(int i, int j);

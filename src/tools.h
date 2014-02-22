@@ -5,7 +5,7 @@
 
 namespace Tools
 {
-// Find x in order to minimize ax^2+bx under the constraint xMax < x < xMin
+// Find x in order to minimize ax^2+bx under the constraint xMin < x < xMax
 static Scalar solve(Scalar a,
                     Scalar b,
                     Scalar xMax,
@@ -16,8 +16,8 @@ static Scalar wrapAngle(Scalar angle);
 
 // Add or deduct 2Pi from angle so that it is the closest value to reference
 static Scalar getClosestAngle(Scalar angle, Scalar reference);
-}
 
-//Compute the value in x of a sigmoid of parameter a
-static Scalar sigmoid(Scalar a, Scalar x);
+//Compute the value in x of a sigmoid of parameter a and centered on x=b
+static Scalar sigmoid(Scalar a, Scalar b, Scalar x);
+}
 #endif // TOOLS_H

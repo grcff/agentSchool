@@ -20,7 +20,7 @@ exp = exp.Experience(agentNumber, 10., 0., 5., boxSize[0], boxSize[1], boxSize[2
 pygame.init()
 
 # Set the height and width of the aquarium
-size = [1100, 1200]
+size = [1050, 850]
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Agent School")
 #Loop until the user clicks the close button.
@@ -35,7 +35,6 @@ while done == False:
 			done = True # Flag that we are done so we exit this loop
 	# Set the screen background
 	screen.fill(black)
-	# Draw the rectangle
 	pygame.draw.ellipse(screen, green, [exp.getXP() - boxSize[2], exp.getYP() - boxSize[3], predatorSize[0], predatorSize[1]], predatorSize[2])
 		
 	try:

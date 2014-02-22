@@ -21,8 +21,6 @@ Experience::Experience(int nbAgent,
                      100,
                      M_PI/2.,
                      box_))
-//http://stackoverflow.com/questions/2860673/initializing-a-c-vector-to-random-values-fast
-//http://stackoverflow.com/questions/6157409/stdvector-to-boostpythonlist
 {
     xInit(nbAgent, v);
 }
@@ -57,9 +55,9 @@ Scalar Experience::getYaw(int i)
     return yawVec_[i];
 }
 //DEBUG:
-int Experience::getNN(int i)
+size_t Experience::getNN(int i)
 {
-    return agentVec_[i].getXVec().rows();
+    return agentVec_[i].getXVec().size();
 }
 
 Scalar Experience::getXN(int i, int j)
