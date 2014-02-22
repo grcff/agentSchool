@@ -36,6 +36,7 @@ Dependencies:
   * Usual compilation tools (GCC/G++, make, etc.)
 2. Libraries:
   * [Boost](http://www.boost.org/) (>=1.55.0): a set of libraries for the C++ programming language that provide support for a huge number of tasks and structures. Here I only use it for python bindings
+  * [Numpy](www.numpy.org/‎): NumPy is the fundamental package for scientific computing with Python.
   * [Pygame](http://pygame.org/): a set of Python modules designed for writing games. I use it for its 2D animation modules.
 
 Install and Start:
