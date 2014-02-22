@@ -35,9 +35,15 @@ Dependencies:
   * CMake (>=2.8)
   * Usual compilation tools (GCC/G++, make, etc.)
 2. Libraries:
-  * Eigen (>=3.0.0): a C++ template library for linear algebra (matrices, vectors, numerical solvers, and related algorithms). I'll get rid of this dependency as it is kinda useless now
-  * Boost (>=1.55.0): a set of libraries for the C++ programming language that provide support for a huge number of tasks and structures
-  * Pygame: a set of Python modules designed for writing games. I use it for its 2D animation modules.
+  * [Boost](http://www.boost.org/) (>=1.55.0): a set of libraries for the C++ programming language that provide support for a huge number of tasks and structures. Here I only use it for python bindings
+  * [Pygame](http://pygame.org/): a set of Python modules designed for writing games. I use it for its 2D animation modules.
+
+Install and Start:
+------------------
+Make sure you have all the dependencies.
+Go to your agentSchool folder, then 'mkdir build' and 'cd build'.
+Then 'cmake .. && make && python agentSchool.py'
+
 
 
 
