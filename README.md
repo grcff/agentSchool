@@ -41,7 +41,11 @@ Dependencies:
 
 Install and Start:
 ------------------
-Make sure you have all the dependencies.
+Make sure you have all the dependencies:
+* 'sudo apt-get install libboost-all-dev' for boost
+* 'apt-get install python-numpy' for numpy
+* 'sudo apt-get install pygame' for pygame
+
 Go to your agentSchool folder, then 'mkdir build' and 'cd build'.
 Then 'cmake .. && make && python agentSchool.py'
 
