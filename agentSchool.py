@@ -12,10 +12,10 @@ red = ( 255, 0, 0)
 agentNumber = 50
 #TODO put predatorSize as a class parameter 
 predatorSize = [50, 50, 10]
-boxSize = [500., 400., -500., -400]
+boxSize = [1000., 800]
 
 #Create a new experience
-exp = exp.Experience(agentNumber, 10., 0., 5., boxSize[0], boxSize[1], boxSize[2], boxSize[3])
+exp = exp.Experience(agentNumber, 10., 10., 5., boxSize[0], boxSize[1], 0., 0.)
 
 pygame.init()
 
@@ -35,12 +35,12 @@ while done == False:
 			done = True # Flag that we are done so we exit this loop
 	# Set the screen background
 	screen.fill(black)
-	pygame.draw.ellipse(screen, green, [exp.getXP() - boxSize[2], exp.getYP() - boxSize[3], predatorSize[0], predatorSize[1]], predatorSize[2])
+	pygame.draw.ellipse(screen, green, [exp.getXP(), exp.getYP(), predatorSize[0], predatorSize[1]], predatorSize[2])
 		
 	try:
 		for i in range(agentNumber):	
-			pygame.draw.ellipse(screen, red, [exp.getX(i) - boxSize[2], exp.getY(i) - boxSize[3], 30, 30], 10)
-			pygame.draw.line(screen, white, [exp.getX(i) - boxSize[2] + 30/2, exp.getY(i) - boxSize[3] + 30/2], [exp.getX(i) - boxSize[2] + 20*np.cos(exp.getYaw(i)) + 30/2, exp.getY(i) - boxSize[3] + 20*np.sin(exp.getYaw(i)) + 30/2], 5)
+			pygame.draw.ellipse(screen, red, [exp.getX(i), exp.getY(i), 16, 16], 5)
+			pygame.draw.line(screen, white, [exp.getX(i) + 8, exp.getY(i) + 8], [exp.getX(i) + 10*np.cos(exp.getYaw(i)) + 8, exp.getY(i) + 10*np.sin(exp.getYaw(i)) + 8], 3)
 			"""			
 			for j in range(exp.getNN(i)):
 				pygame.draw.line(screen, green, [exp.getX(i) - boxSize[2] + 30/2 + 5, exp.getY(i) - boxSize[3] + 30/2], [exp.getXN(i, j) - boxSize[2] + 30/2, exp.getYN(i, j) - boxSize[3] + 30/2], 1)
@@ -50,11 +50,6 @@ while done == False:
 	except TypeError:
 		print exp.getX(i) - boxSize[2]
 		print exp.getY(i) - boxSize[3]
-	"""
-	pygame.draw.ellipse(screen, red, [200, 200, 6, 6], 3)	
-	pygame.draw.line(screen, white, [200, 200], [200 + 20*np.cos(3.141/2.), 200 + 20*np.sin(3.141/2.)], 5)
-	pygame.draw.line(screen, green, [200, 200], [200 + 20*np.cos(3.141), 200 + 20*np.sin(3.141)], 5)
-	"""
 
 	exp.update(1.)
 	# Limit to 20 frames per second
