@@ -193,7 +193,8 @@ Scalar Agent::xGetMeanDirectionGradient(Scalar t)
             meanYaw += Tools::getClosestAngle(nYawVec_[i], yaw_);
         }
 
-        return t*(yaw_ - (1/static_cast<Scalar>(m+1))*meanYaw);
+Scalar randomAngle = (M_PI/10)*((Scalar) rand() / (RAND_MAX)) - M_PI/20;
+        return t*(yaw_ - (1/static_cast<Scalar>(m+1))*meanYaw + randomAngle);
     }
 
     return 0.;
@@ -276,7 +277,7 @@ Scalar Agent::xGetWanderAngleGradient(Scalar t)
 
 void Agent::xGetWanderAngleWeight()
 {
-    wanderAngleWeight_ = 1;
+    wanderAngleWeight_ = 5;
 }
 
 /*********************************************/
@@ -358,7 +359,7 @@ void Agent::xGetAntiStackingWeight()
     for(size_t i=0; i<m; ++i)
     {
         antiStackWeightVec_[i] =
-                20*Tools::sigmoid(-0.5, 25, std::sqrt(std::pow(x_ - nXVec_[i], 2) + std::pow(y_ - nYVec_[i], 2)));
+                20*Tools::sigmoid(-0.5, 2*size_, std::sqrt(std::pow(x_ - nXVec_[i], 2) + std::pow(y_ - nYVec_[i], 2)));
     }
 }
 

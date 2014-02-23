@@ -5,6 +5,7 @@
 #include "src/agent.cpp"
 
 Experience::Experience(int nbAgent,
+                       Scalar size,
                        Scalar xP,
                        Scalar yP,
                        Scalar v,
@@ -15,8 +16,8 @@ Experience::Experience(int nbAgent,
     :box_(xMax, yMax, xMin, yMin)
     ,predator_(xP, yP, v, box_)
     ,agentVec_(nbAgent,
-               Agent(30.,
-                     v/2.,
+               Agent(size,
+                     v/1.5,
                      M_PI/60.,//M_PI/16.,
                      100,
                      M_PI/2.,
@@ -159,7 +160,7 @@ BOOST_PYTHON_MODULE(experience)
     //using namespace boost::python;
     //def("update", &Experience::update);
 
-    class_<Experience>("Experience", init<int, Scalar, Scalar, Scalar,
+    class_<Experience>("Experience", init<int, Scalar, Scalar, Scalar, Scalar,
                        Scalar, Scalar, Scalar, Scalar>())
             .def("getXP", &Experience::getXP)
             .def("getYP", &Experience::getYP)

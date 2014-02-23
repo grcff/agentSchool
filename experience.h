@@ -8,6 +8,7 @@ class Experience
 {
 public:
     Experience(int nbAgent,
+               Scalar size,
                Scalar xP,
                Scalar yP,
                Scalar v,
