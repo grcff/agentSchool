@@ -93,6 +93,7 @@ void Agent::updatePos(Scalar t)
     hessian_ = backPredatorWeight_*xGetBackPredatorHessian(t)
             + meanDirectionWeight_*xGetMeanDirectionHessian(t)
             + wanderAngleWeight_*xGetWanderAngleHessian(t);
+
     gradient_ = backPredatorWeight_*xGetBackPredatorGradient(t)
             + meanDirectionWeight_*xGetMeanDirectionGradient(t)
             + wanderAngleWeight_*xGetWanderAngleGradient(t) ;
@@ -107,6 +108,12 @@ void Agent::updatePos(Scalar t)
     gradient_ = predatorDistanceWeight_*xGetPredatorDistanceGradient(t)
             + barycenterWeight_*xGetBarycenterGradient(t)
             + wanderWeight_*xGetWanderGradient(t);
+
+    for(size_t i=0; i<nXVec_.size(); ++i)
+    {
+        hessian_ += antiStackWeightVec_[i]*xGetAntiStackingHessian(t);
+        gradient_ += antiStackWeightVec_[i]*xGetAntiStackingGradient(t, i);
+    }
 
     // Updating x and y coordinate
     Scalar sol = Tools::solve(hessian_, 2*gradient_, std::min(xGetVMaxBound(t), vMax_), 0.);
@@ -323,7 +330,7 @@ Scalar Agent::xGetPredatorDistanceGradient(Scalar t)
 
 void Agent::xGetPredatorDistanceWeight()
 {
-    if(std::pow((x_ - xP_), 2) + std::pow((y_ - yP_), 2) < std::pow(sightHorizon_, 2))
+    if(std::pow(x_ - xP_, 2) + std::pow(y_ - yP_, 2) < std::pow(sightHorizon_, 2))
         //TODO: sightHorizon_ pourrait être déterminé par l'algo gen
     {
         predatorDistanceWeight_ = 100.;
@@ -334,25 +341,24 @@ void Agent::xGetPredatorDistanceWeight()
     }
 }
 
-//TODO: complete
 Scalar Agent::xGetAntiStackingHessian(Scalar t)
 {
-    return 0.;
-}
-//TODO: complete
-Scalar Agent::xGetAntiStackingGradient(Scalar t)
-{
-    return 0.;
+    return -t*t;
 }
 
-//TODO: complete
+Scalar Agent::xGetAntiStackingGradient(Scalar t, size_t agentIndex)
+{
+    return t*(std::cos(yaw_)*(nXVec_[agentIndex] - x_) + std::sin(yaw_)*(nYVec_[agentIndex] - y_));
+}
+
 void Agent::xGetAntiStackingWeight()
 {
     size_t m = nYawVec_.size();
     antiStackWeightVec_.resize(m);
-    for(size_t i=0; i<m; i++)
+    for(size_t i=0; i<m; ++i)
     {
-        //antiStackWeightVec_[i] = Tools::sigmoid(1000, 25, )
+        antiStackWeightVec_[i] =
+                20*Tools::sigmoid(-0.5, 25, std::sqrt(std::pow(x_ - nXVec_[i], 2) + std::pow(y_ - nYVec_[i], 2)));
     }
 }
 

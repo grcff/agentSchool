@@ -88,7 +88,7 @@ private:
     void xGetPredatorDistanceWeight();
 
     Scalar xGetAntiStackingHessian(Scalar t);
-    Scalar xGetAntiStackingGradient(Scalar t);
+    Scalar xGetAntiStackingGradient(Scalar t, size_t agentIndex);
     void xGetAntiStackingWeight();
 
     Scalar xGetWanderHessian(Scalar t);
