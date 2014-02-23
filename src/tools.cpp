@@ -4,17 +4,10 @@
 
 
 Scalar Tools::solve(Scalar a,
-             Scalar b,
-             Scalar xMax,
-             Scalar xMin)
+                    Scalar b,
+                    Scalar xMax,
+                    Scalar xMin)
 {
-    assert (std::abs(a) > EPSILON || std::abs(b) < EPSILON);
-
-    if(std::abs(a) < EPSILON && std::abs(b) < EPSILON)
-    {
-        return 0;
-    }
-
     Scalar xStat = -b/(2*a);
 
     if(a > EPSILON)
@@ -32,7 +25,7 @@ Scalar Tools::solve(Scalar a,
             return xStat;
         }
     }
-    else if(a < EPSILON)
+    else if(a < -EPSILON)
     {
         if(xStat > xMax)
         {
@@ -46,7 +39,24 @@ Scalar Tools::solve(Scalar a,
         {
             return std::abs(xStat - xMax)>std::abs(xStat - xMin)?xMax:xMin;
         }
-
+    }
+    else
+    {
+        if(std::abs(b) < EPSILON)
+        {
+            return 0.;
+        }
+        else
+        {
+            if(b > EPSILON)
+            {
+                return xMin;
+            }
+            else
+            {
+                return xMax;
+            }
+        }
     }
 }
 

@@ -252,23 +252,24 @@ Scalar Agent::xGetWanderAngleHessian(Scalar t)
 
 Scalar Agent::xGetWanderAngleGradient(Scalar t)
 {
+    Scalar randomAngle = (M_PI/10)*((Scalar) rand() / (RAND_MAX)) - M_PI/20;
     Scalar d = size_/10.; // arbitrary...
 
     if(std::abs(x_ - box_.xMax_) < d)
     {
-        return -t*(yaw_ - Tools::getClosestAngle(0., yaw_));
+        return -t*(yaw_ - Tools::getClosestAngle(0., yaw_) + randomAngle);
     }
     else if(std::abs(x_ - box_.xMin_) < d)
     {
-        return -t*(yaw_ - Tools::getClosestAngle(M_PI, yaw_));
+        return -t*(yaw_ - Tools::getClosestAngle(M_PI, yaw_) + randomAngle);
     }
     else if(std::abs(y_ - box_.yMax_) < d)
     {
-        return -t*(yaw_ - Tools::getClosestAngle(M_PI/2., yaw_));
+        return -t*(yaw_ - Tools::getClosestAngle(M_PI/2., yaw_) + randomAngle);
     }
     else if(std::abs(y_ - box_.yMin_) < d)
     {
-        return -t*(yaw_ - Tools::getClosestAngle(3.*M_PI/2., yaw_));
+        return -t*(yaw_ - Tools::getClosestAngle(3.*M_PI/2., yaw_) + randomAngle);
     }
 
     return 0.;
