@@ -10,10 +10,10 @@ green = ( 0, 255, 0)
 red = ( 255, 0, 0)
 
 # Define experience parameters
-agentNumber = 50
+agentNumber = 100
 agentSize = 16
 predatorSize = [50, 50, 10] #TODO put predatorSize as a class parameter 
-boxSize = [1200, 800]
+boxSize = [1500, 900]
 
 #Create a new experience
 exp = exp.Experience(agentNumber, agentSize, 10., 10., 6., boxSize[0], boxSize[1], 0., 0.)
