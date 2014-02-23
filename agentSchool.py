@@ -16,7 +16,7 @@ predatorSize = [50, 50, 10] #TODO put predatorSize as a class parameter
 boxSize = [1200, 800]
 
 #Create a new experience
-exp = exp.Experience(agentNumber, agentSize, 10., 10., 4., boxSize[0], boxSize[1], 0., 0.)
+exp = exp.Experience(agentNumber, agentSize, 10., 10., 6., boxSize[0], boxSize[1], 0., 0.)
 
 pygame.init()
 
@@ -52,7 +52,7 @@ while done == False:
 
 	exp.update(1.)
 	# Limit to 20 frames per second
-	clock.tick(75)
+	clock.tick(50)
 	# Go ahead and update the screen with what we've drawn.
 	pygame.display.flip()
 	# Be IDLE friendly. If you forget this line, the program will 'hang'

@@ -194,7 +194,7 @@ Scalar Agent::xGetMeanDirectionGradient(Scalar t)
         }
 
 Scalar randomAngle = (M_PI/10)*((Scalar) rand() / (RAND_MAX)) - M_PI/20;
-        return t*(yaw_ - (1/static_cast<Scalar>(m+1))*meanYaw + randomAngle);
+        return t*(yaw_ - (1/static_cast<Scalar>(m+1))*meanYaw);
     }
 
     return 0.;
@@ -238,46 +238,53 @@ void Agent::xGetBackPredatorWeight()
 
 Scalar Agent::xGetWanderAngleHessian(Scalar t)
 {
-    Scalar d = size_/10.; // arbitrary...
-    if(std::abs(x_ - box_.xMax_) < d ||
-            std::abs(x_ - box_.xMin_) < d ||
-            std::abs(y_ - box_.yMax_) < d ||
-            std::abs(y_ - box_.yMin_) < d)
-    {
         return -t*t;
-    }
-
-    return 1.;
 }
 
 Scalar Agent::xGetWanderAngleGradient(Scalar t)
 {
+    Scalar out = 0;
     Scalar randomAngle = (M_PI/10)*((Scalar) rand() / (RAND_MAX)) - M_PI/20;
-    Scalar d = size_/10.; // arbitrary...
+    Scalar d = 5*size_; // arbitrary...
+
 
     if(std::abs(x_ - box_.xMax_) < d)
     {
-        return -t*(yaw_ - Tools::getClosestAngle(0., yaw_) + randomAngle);
+        out += -t*(yaw_ - Tools::getClosestAngle(0., yaw_));
     }
-    else if(std::abs(x_ - box_.xMin_) < d)
+    if(std::abs(x_ - box_.xMin_) < d)
     {
-        return -t*(yaw_ - Tools::getClosestAngle(M_PI, yaw_) + randomAngle);
+        out += -t*(yaw_ - Tools::getClosestAngle(M_PI, yaw_));
     }
-    else if(std::abs(y_ - box_.yMax_) < d)
+    if(std::abs(y_ - box_.yMax_) < d)
     {
-        return -t*(yaw_ - Tools::getClosestAngle(M_PI/2., yaw_) + randomAngle);
+        out += -t*(yaw_ - Tools::getClosestAngle(M_PI/2., yaw_));
     }
-    else if(std::abs(y_ - box_.yMin_) < d)
+    if(std::abs(y_ - box_.yMin_) < d)
     {
-        return -t*(yaw_ - Tools::getClosestAngle(3.*M_PI/2., yaw_) + randomAngle);
+        out += -t*(yaw_ - Tools::getClosestAngle(3.*M_PI/2., yaw_));
     }
 
-    return 0.;
+    if(out==0)
+    {
+        out = t*randomAngle;
+    }
+
+    return out;
 }
 
 
 void Agent::xGetWanderAngleWeight()
 {
+    Scalar d = size_/10.; // arbitrary...
+
+    if(std::abs(x_ - box_.xMax_) < d ||
+            std::abs(x_ - box_.xMin_) < d ||
+            std::abs(y_ - box_.yMax_) < d ||
+            std::abs(y_ - box_.yMin_) < d)
+    {
+        wanderAngleWeight_ = 20;
+    }
     wanderAngleWeight_ = 5;
 }
 
@@ -335,7 +342,7 @@ void Agent::xGetPredatorDistanceWeight()
     if(std::pow(x_ - xP_, 2) + std::pow(y_ - yP_, 2) < std::pow(sightHorizon_, 2))
         //TODO: sightHorizon_ pourrait être déterminé par l'algo gen
     {
-        predatorDistanceWeight_ = 100.;
+        predatorDistanceWeight_ = 500.;
     }
     else
     {
