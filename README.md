@@ -24,6 +24,8 @@ Each agent moves are determined by a quadratic problem which models the followin
 
 This model, inspired by [Craig Reynolds's work](http://www.red3d.com/cwr/boids/), is quite raw for now, but I would like to make it work before going any further. Also, each target has a weight in the quadratic QP. I expect the seek for these coefficients to be particulary hard, as they probably will not be constant. For instance, when an agent is far from the predator, it should not give as much importance to the target 'Fleeing from the predator' as if the predator was very close.
 
+This first [video](http://www.youtube.com/watch?v=Zg31C1Z0uiI&feature=youtu.be) shows what it looks like today. 
+
 TODO:
 -----
 
