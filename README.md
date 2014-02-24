@@ -4,7 +4,7 @@ agentSchool
 Description:
 -------------
 
-agentSchool is a c++/python project which aims to reproduce the schooling/boids behavior of certains animals, typically fishes. The output of the project is a 2D view of an bounded box containing multiple agents and a predator. Each agent's behavior is driven by a multi-target command corresponding to the solution of a quadratic problem.
+agentSchool is a c++/python project which aims to reproduce the schooling/boids flocking behavior of certains animals, typically fishes. The output of the project is a 2D view of an bounded box containing multiple agents and a predator. Each agent's behavior is driven by a multi-target command corresponding to the solution of a quadratic problem.
 
 For now, the predator is initially set with a random direction and only moves forward with a constant speed.
 Agents are initially placed in random positions in the aquarium, with random directions. They are able to rotate around their yaw axis up to a maximum angular speed limit, and they can move forward up to a maximum speed limit. They constantly know where is the predator, and they see the other agents up to a maximum distance and up to a maximum angle of view. The agents that one agent can see are called its 'neighbors'. 
@@ -46,7 +46,7 @@ Install and Start:
 ------------------
 Make sure you have all the dependencies:
 * 'sudo apt-get install libboost-all-dev' for boost
-* 'apt-get install python-numpy' for numpy
+* 'sudo apt-get install python-numpy' for numpy
 * 'sudo apt-get install pygame' for pygame
 
 Go to your agentSchool folder, then 'mkdir build' and 'cd build'.
