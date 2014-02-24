@@ -22,11 +22,14 @@ Each agent moves are determined by a quadratic problem which models the followin
 3. Natural behavior
   *  Wandering around
 
-This model, inspired by [Craig Reynolds's work](http://www.red3d.com/cwr/boids/), is quite rough for now, but I would like to make it work before going any further. Also, each target has a weight in the quadratic QP. I expect the seek for these coefficients to be particulary hard, as they probably will not be constant. For instance, when an agent is far from the predator, it should not give as much importance to the target 'Fleeing from the predator' as if the predator was very close.
+This model, inspired by [Craig Reynolds's work](http://www.red3d.com/cwr/boids/), is quite raw for now, but I would like to make it work before going any further. Also, each target has a weight in the quadratic QP. I expect the seek for these coefficients to be particulary hard, as they probably will not be constant. For instance, when an agent is far from the predator, it should not give as much importance to the target 'Fleeing from the predator' as if the predator was very close.
+
+TODO:
+-----
 
 I think about implementing a genetic algorithm to determine these coefficients. This could be done by giving the predator the ability to 'eat' agents for instance. Hopefully it will make it easier to converge to a wanted global behavior.
 
-Understand that this project is some kind of prototype and of course I am not done finishing it.
+Also C++ is not a proper language for this kind of application, I should go for specific Java multi-agent modules or even functional programming languages like haskell or Clojure, which all have multi-agent frameworks.
 
 Dependencies:
 -------------
