@@ -4,6 +4,14 @@
 #include "src/predator.cpp"
 #include "src/agent.cpp"
 
+/*TODO: Refactor code:
+-1 base class "agent" for predator and fish
+-add Z coordinate
+-3D graphics with openGL --> create agentSchool 2.0 as 2D interface is better for debugging
+-predator behavior
+
+-No multi-threading for now, but maybe later (like 1 thread for the predator, one thread for the fishes and one main thread...)
+*/
 Experience::Experience(int nbAgent,
                        Scalar size,
                        Scalar xP,
